@@ -1,0 +1,35 @@
+<link rel="import" href="../tangere/tangere.html" />
+
+<dom-module id="at-silver-adaptive">
+  <template>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+      }
+    </style>
+    
+    <div>
+      at-silver-adaptive
+    </div>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "at-silver-adaptive",
+    properties: {
+
+      view: {
+        type: Object,
+        value: function() {
+          return {};
+        },
+        xtype: 'json'
+      }
+
+    },
+    ready: function () {
+
+    }
+  });
+</script>
