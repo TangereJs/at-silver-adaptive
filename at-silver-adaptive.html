@@ -198,6 +198,7 @@
     },
 
     // TODO(ij): confirm that default host config has all available properties set
+    // reference url: https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig
     _DEFAULT_HOST_CONFIG: {
       spacing: {
         small: 3,
@@ -368,6 +369,19 @@
         } catch (e) { console.log(e); }
       }
 
+      // TODO(ij): using one handler is probably a bad idea because handling actions would require special handling
+      // right now it works because its only doing style scoping
+      var boundFn = this._handleCardExecuteAction.bind(this);
+      
+      // onAnchorClicked is used because links can be present on the card
+      AdaptiveCards.AdaptiveCard.onAnchorClicked = boundFn;
+
+      // onExecuteAction is used because one can click view button on the card
+      AdaptiveCards.AdaptiveCard.onExecuteAction = boundFn;
+
+      // onInlineCardExpanded is used becuase some buttons show/hide parts of the card
+      AdaptiveCards.AdaptiveCard.onInlineCardExpanded = boundFn;
+
       var adaptiveCard = new AdaptiveCards.AdaptiveCard();
       adaptiveCard.hostConfig = config;
       adaptiveCard.parse(view);
@@ -375,8 +389,10 @@
 
       Polymer.dom(this.$.rcContainer).innerHTML = "";
       Polymer.dom(this.$.rcContainer).appendChild(renderedCard);
+    },
 
-      // TODO(ij): when actions are performed style scoping is lost
+    _handleCardExecuteAction: function(action) {
+      // when actions are performed style scoping is lost; redo the style scoping
       var child = Polymer.dom(this.$.rcContainer).children[0];
       this.scopeSubtree(child, true);
     },
