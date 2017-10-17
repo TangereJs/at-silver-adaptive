@@ -197,7 +197,7 @@
       this._templateCache = templateCache;
     },
 
-    // TODO(ij): confirm that default host config has all available properties set
+    // TODO(ij): add more properties to default host config as necessary
     // reference url: https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig
     _DEFAULT_HOST_CONFIG: {
       spacing: {
@@ -369,18 +369,14 @@
         } catch (e) { console.log(e); }
       }
 
-      // TODO(ij): using one handler is probably a bad idea because handling actions would require special handling
-      // right now it works because its only doing style scoping
-      var boundFn = this._handleCardExecuteAction.bind(this);
-      
       // onAnchorClicked is used because links can be present on the card
-      AdaptiveCards.AdaptiveCard.onAnchorClicked = boundFn;
+      AdaptiveCards.AdaptiveCard.onAnchorClicked = this._handleOnAnchorClicked.bind(this);
 
       // onExecuteAction is used because one can click view button on the card
-      AdaptiveCards.AdaptiveCard.onExecuteAction = boundFn;
+      AdaptiveCards.AdaptiveCard.onExecuteAction = this._handleCardExecuteAction.bind(this);
 
       // onInlineCardExpanded is used becuase some buttons show/hide parts of the card
-      AdaptiveCards.AdaptiveCard.onInlineCardExpanded = boundFn;
+      AdaptiveCards.AdaptiveCard.onInlineCardExpanded = this._handleOnInlineCardExpanded.bind(this);
 
       var adaptiveCard = new AdaptiveCards.AdaptiveCard();
       adaptiveCard.hostConfig = config;
@@ -391,7 +387,22 @@
       Polymer.dom(this.$.rcContainer).appendChild(renderedCard);
     },
 
+    _handleOnAnchorClicked: function(event) {
+
+      this._applyStyleScopeToAdaptiveCard();
+    },
+
     _handleCardExecuteAction: function(action) {
+
+      this._applyStyleScopeToAdaptiveCard();
+    },
+
+    _handleOnInlineCardExpanded: function(event) {
+
+      this._applyStyleScopeToAdaptiveCard();
+    },
+
+    _applyStyleScopeToAdaptiveCard: function() {
       // when actions are performed style scoping is lost; redo the style scoping
       var child = Polymer.dom(this.$.rcContainer).children[0];
       this.scopeSubtree(child, true);
