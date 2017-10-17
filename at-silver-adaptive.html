@@ -1,5 +1,6 @@
 <link rel="import" href="../tangere/tangere.html" />
 
+<link rel="import" href="../liquid.js/liquid-import.html">
 <script src="lib/adaptivecards.js"></script>
 
 <dom-module id="at-silver-adaptive">
@@ -122,20 +123,58 @@
   Polymer({
     is: "at-silver-adaptive",
     properties: {
+      /**
+       * object or json representation of adaptive card
+       * 
+       * @property view
+       * @type String | Object
+       * @default null
+       */
       view: {
         type: Object,
         value: function() {
           return null;
         },
-        xtype: 'json'
+        xtype: 'json',
+        xgridcols: "12",
+        maxLines: 0,
+        mode: 'application/json'
       },
 
+      /**
+       * object or json representation of style values that will be used to render adaptive card
+       * 
+       * @property hostConfig
+       * @type String | Object
+       * @default {}
+       */
       hostConfig: {
         type: Object,
         value: function() {
           return {};
         },
-        xtype: 'json'
+        xtype: 'json',
+        xgridcols: "12",
+        maxLines: 0,
+        mode: 'application/json'
+      },
+
+      /**
+       * the data object that will be used to render the liquid template
+       * 
+       * @property data
+       * @type Object
+       * @default {}
+       */
+      data: {
+        type: Object,
+        value: function() {
+          return {};
+        },
+        xtype: 'json',
+        xgridcols: "12",
+        maxLines: 0,
+        mode: 'application/json'
       }
     },
 
@@ -148,7 +187,7 @@
     }],
 
     observers: [
-      '_updateRenderedView(view, hostConfig)'
+      '_updateRenderedView(view, hostConfig, data)'
     ],
 
     ready: function() { },
@@ -279,12 +318,29 @@
       }
     },
 
-    _updateRenderedView: function(view, hostConfig) {
+    // TODO(ij): consider making view a string only; if view is object liquid parsing will be ignored
+    
+    _updateRenderedView: function(view, hostConfig, data) {
       function isString(obj) {
         return Object.prototype.toString.apply(obj) === "[object String]";
       }
 
       if (!view) return;
+
+      if (isString(view)) {
+        try {
+          var lqView = Liquid.parse(view);
+
+          if (isString(data)) {
+            data = JSON.parse(data);
+          }
+
+          var lqJson = lqView.render(data);
+          
+          view = JSON.parse(lqJson);
+
+        } catch (e) { console.log(e); }
+      }
 
       var config = this._DEFAULT_HOST_CONFIG;
       
