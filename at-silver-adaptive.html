@@ -120,6 +120,9 @@
   </template>
 </dom-module>
 <script>
+(function(){
+  var templateCache = {};
+
   Polymer({
     is: "at-silver-adaptive",
     properties: {
@@ -190,7 +193,9 @@
       '_updateRenderedView(view, hostConfig, data)'
     ],
 
-    ready: function() { },
+    ready: function() {
+      this._templateCache = templateCache;
+    },
 
     // TODO(ij): confirm that default host config has all available properties set
     _DEFAULT_HOST_CONFIG: {
@@ -319,7 +324,7 @@
     },
 
     // TODO(ij): consider making view a string only; if view is object liquid parsing will be ignored
-    
+
     _updateRenderedView: function(view, hostConfig, data) {
       function isString(obj) {
         return Object.prototype.toString.apply(obj) === "[object String]";
@@ -329,7 +334,12 @@
 
       if (isString(view)) {
         try {
-          var lqView = Liquid.parse(view);
+          var lqView = this._templateCache[view];
+
+          if (!lqView) {
+            lqView = Liquid.parse(view);
+            this._templateCache[view] = lqView;
+          }
 
           if (isString(data)) {
             data = JSON.parse(data);
@@ -339,7 +349,9 @@
           
           view = JSON.parse(lqJson);
 
-        } catch (e) { console.log(e); }
+        } catch (e) { 
+          // console.log(e);
+        }
       }
 
       var config = this._DEFAULT_HOST_CONFIG;
@@ -355,7 +367,6 @@
           config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfigObj);
         } catch (e) { console.log(e); }
       }
-    
 
       var adaptiveCard = new AdaptiveCards.AdaptiveCard();
       adaptiveCard.hostConfig = config;
@@ -422,5 +433,5 @@
     }
 
   });
-
+})();
 </script>
