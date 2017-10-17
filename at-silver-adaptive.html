@@ -127,7 +127,14 @@
         value: function() {
           return null;
         },
-        observer: '_viewChanged',
+        xtype: 'json'
+      },
+
+      hostConfig: {
+        type: Object,
+        value: function() {
+          return {};
+        },
         xtype: 'json'
       }
     },
@@ -140,144 +147,224 @@
       icon: "now:wrench"
     }],
 
+    observers: [
+      '_updateRenderedView(view, hostConfig)'
+    ],
+
     ready: function() { },
 
-    _viewChanged: function(newValue, oldValue) {
-      if (!newValue) return;
-
-      var hostConfig = {
-        spacing: {
-          small: 3,
-          default: 8,
-          medium: 20,
-          large: 30,
-          extraLarge: 40,
-          padding: 10
-        },
-        separator: {
-          lineThickness: 1,
-          lineColor: "#EEEEEE"
-        },
-        supportsInteractivity: true,
-        fontFamily: "Segoe UI",
-        fontSizes: {
-          small: 12,
-          default: 14,
-          medium: 17,
-          large: 21,
-          extraLarge: 26
-        },
-        fontWeights: {
-          lighter: 200,
-          default: 400,
-          bolder: 600
-        },
-        containerStyles: {
-          default: {
-            backgroundColor: "#00000000",
-            fontColors: {
-              default: {
-                normal: "#333333",
-                subtle: "#EE333333"
-              },
-              accent: {
-                normal: "#2E89FC",
-                subtle: "#882E89FC"
-              },
-              attention: {
-                normal: "#FF0000",
-                subtle: "#DDFFD800"
-              },
-              good: {
-                normal: "#00FF00",
-                subtle: "#DD00FF00"
-              },
-              warning: {
-                normal: "#FFD800",
-                subtle: "#DDFF0000"
-              }
-            }
-          },
-          emphasis: {
-            backgroundColor: "08000000",
-            fontColors: {
-              default: {
-                normal: "#333333",
-                subtle: "#EE333333"
-              },
-              accent: {
-                normal: "#2E89FC",
-                subtle: "#882E89FC"
-              },
-              attention: {
-                normal: "#FFD800",
-                subtle: "#DDFFD800"
-              },
-              good: {
-                normal: "#00FF00",
-                subtle: "#DD00FF00"
-              },
-              warning: {
-                normal: "#FF0000",
-                subtle: "#DDFF0000"
-              }
+    // TODO(ij): confirm that default host config has all available properties set
+    _DEFAULT_HOST_CONFIG: {
+      spacing: {
+        small: 3,
+        default: 8,
+        medium: 20,
+        large: 30,
+        extraLarge: 40,
+        padding: 10
+      },
+      separator: {
+        lineThickness: 1,
+        lineColor: "#EEEEEE"
+      },
+      supportsInteractivity: true,
+      fontFamily: "Segoe UI",
+      fontSizes: {
+        small: 12,
+        default: 14,
+        medium: 17,
+        large: 21,
+        extraLarge: 26
+      },
+      fontWeights: {
+        lighter: 200,
+        default: 400,
+        bolder: 600
+      },
+      containerStyles: {
+        default: {
+          backgroundColor: "#00000000",
+          fontColors: {
+            default: {
+              normal: "#333333",
+              subtle: "#EE333333"
+            },
+            accent: {
+              normal: "#2E89FC",
+              subtle: "#882E89FC"
+            },
+            attention: {
+              normal: "#FF0000",
+              subtle: "#DDFFD800"
+            },
+            good: {
+              normal: "#00FF00",
+              subtle: "#DD00FF00"
+            },
+            warning: {
+              normal: "#FFD800",
+              subtle: "#DDFF0000"
             }
           }
         },
-        imageSizes: {
-          small: 40,
-          medium: 80,
-          large: 160
-        },
-        actions: {
-          maxActions: 3,
-          spacing: 2,
-          buttonSpacing: 10,
-          showCard: {
-            actionMode: "inline",
-            inlineTopMargin: 16
-          },
-          actionsOrientation: 0,
-          actionAlignment: 0
-        },
-        adaptiveCard: {
-          allowCustomStyle: false
-        },
-        image: {
-          size: "medium",
-        },
-        imageSet: {
-          imageSize: "medium",
-          maxImageHeight: 100
-        },
-        factSet: {
-          title: {
-            color: "default",
-            size: "default",
-            isSubtle: false,
-            weight: "bolder",
-            wrap: true,
-            maxWidth: 150
-          },
-          value: {
-            color: "default",
-            size: "default",
-            isSubtle: false,
-            weight: "default",
-            wrap: true
-          },
-          spacing: 10
+        emphasis: {
+          backgroundColor: "08000000",
+          fontColors: {
+            default: {
+              normal: "#333333",
+              subtle: "#EE333333"
+            },
+            accent: {
+              normal: "#2E89FC",
+              subtle: "#882E89FC"
+            },
+            attention: {
+              normal: "#FFD800",
+              subtle: "#DDFFD800"
+            },
+            good: {
+              normal: "#00FF00",
+              subtle: "#DD00FF00"
+            },
+            warning: {
+              normal: "#FF0000",
+              subtle: "#DDFF0000"
+            }
+          }
         }
-      };
+      },
+      imageSizes: {
+        small: 40,
+        medium: 80,
+        large: 160
+      },
+      actions: {
+        maxActions: 3,
+        spacing: 2,
+        buttonSpacing: 10,
+        showCard: {
+          actionMode: "inline",
+          inlineTopMargin: 16
+        },
+        actionsOrientation: 0,
+        actionAlignment: 0
+      },
+      adaptiveCard: {
+        allowCustomStyle: false
+      },
+      image: {
+        size: "medium",
+      },
+      imageSet: {
+        imageSize: "medium",
+        maxImageHeight: 100
+      },
+      factSet: {
+        title: {
+          color: "default",
+          size: "default",
+          isSubtle: false,
+          weight: "bolder",
+          wrap: true,
+          maxWidth: 150
+        },
+        value: {
+          color: "default",
+          size: "default",
+          isSubtle: false,
+          weight: "default",
+          wrap: true
+        },
+        spacing: 10
+      }
+    },
+
+    _updateRenderedView: function(view, hostConfig) {
+      function isString(obj) {
+        return Object.prototype.toString.apply(obj) === "[object String]";
+      }
+
+      if (!view) return;
+
+      var config = this._DEFAULT_HOST_CONFIG;
       
+      if (this._isObject(hostConfig)) {
+        // merge hostConfig with default config and use that as config
+        config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfig);
+
+      } else if (isString(hostConfig)) {
+        // parse json and merge with default config and use that as config
+        try {
+          var hostConfigObj = JSON.parse(hostConfig);
+          config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfigObj);
+        } catch (e) { console.log(e); }
+      }
+    
+
       var adaptiveCard = new AdaptiveCards.AdaptiveCard();
-      adaptiveCard.hostConfig = hostConfig;
-      adaptiveCard.parse(newValue);
+      adaptiveCard.hostConfig = config;
+      adaptiveCard.parse(view);
       var renderedCard = adaptiveCard.render();
 
       Polymer.dom(this.$.rcContainer).innerHTML = "";
       Polymer.dom(this.$.rcContainer).appendChild(renderedCard);
+
+      // TODO(ij): when actions are performed style scoping is lost
+      var child = Polymer.dom(this.$.rcContainer).children[0];
+      this.scopeSubtree(child, true);
+    },
+
+    _mergeConfigurations: function(src1, src2) {
+      var result = {};
+
+      var src1keys = Object.keys(src1);
+      var src2keys = Object.keys(src2);
+
+      if (!src2keys.length) return src1;
+
+      // iterate over src1 keys
+      src1keys.forEach(function(src1key) {
+        // check if src1key exists in src2
+        var exists = this._existsInArray(src1key, src2keys);
+        
+        if (exists) {
+          // if exists copy values from src2 to result
+          var src1Value = src1[src1key];
+          var src2Value = src2[src1key];
+
+          if (this._isObject(src1Value) && this._isObject(src2Value)) {
+            result[src1key] = this._mergeConfigurations(src1[src1key], src2[src1key]);
+
+          } else {            
+            result[src1key] = src2Value;
+          }
+
+        } else {
+          // else use values from src1
+          result[src1key] = src1[src1key];
+        }
+      }, this);
+
+      return result;
+    },
+
+    _isObject: function(obj) {
+      return Object.prototype.toString.apply(obj) === "[object Object]";
+    },
+
+    _isArray: function(obj) {
+      return Object.prototype.toString.apply(obj) === "[object Array]";
+    },
+
+    _existsInArray: function(key, array) {
+      for (var i = 0; i < array.length; i++) {
+        var current = array[i];
+        if (current === key) return true;
+      }
+
+      return false;
     }
+
   });
 
 </script>
