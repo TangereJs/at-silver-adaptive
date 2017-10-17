@@ -127,17 +127,15 @@
     is: "at-silver-adaptive",
     properties: {
       /**
-       * object or json representation of adaptive card
+       * json representation of adaptive card. Must be a string with or without liquid markup
        * 
        * @property view
-       * @type String | Object
-       * @default null
+       * @type String
+       * @default '{}'
        */
       view: {
         type: Object,
-        value: function() {
-          return null;
-        },
+        value:'{}',
         xtype: 'json',
         xgridcols: "12",
         maxLines: 0,
@@ -324,36 +322,39 @@
       }
     },
 
-    // TODO(ij): consider making view a string only; if view is object liquid parsing will be ignored
-
     _updateRenderedView: function(view, hostConfig, data) {
       function isString(obj) {
         return Object.prototype.toString.apply(obj) === "[object String]";
       }
 
       if (!view) return;
+      if (!this._isString(view)) return;
 
-      if (isString(view)) {
-        try {
-          var lqView = this._templateCache[view];
+      try {
 
-          if (!lqView) {
-            lqView = Liquid.parse(view);
-            this._templateCache[view] = lqView;
-          }
+        var lqView = this._templateCache[view];
 
-          if (isString(data)) {
-            data = JSON.parse(data);
-          }
-
-          var lqJson = lqView.render(data);
-          
-          view = JSON.parse(lqJson);
-
-        } catch (e) { 
-          // console.log(e);
+        if (!lqView) {
+          lqView = Liquid.parse(view);
+          this._templateCache[view] = lqView;
         }
+
+        if (isString(data)) {
+          data = JSON.parse(data);
+        }
+
+        var lqJson = lqView.render(data);
+        
+        view = JSON.parse(lqJson);
+
+      } catch (e) {
+        // console.log(e);
+        return;
       }
+
+      // ignore empty views
+      var viewKeys = Object.keys(view);
+      if (!viewKeys.length) return;
 
       var config = this._DEFAULT_HOST_CONFIG;
       
@@ -440,6 +441,10 @@
       }, this);
 
       return result;
+    },
+
+    _isString: function(obj) {
+      return Object.prototype.toString.apply(obj) === "[object String]";
     },
 
     _isObject: function(obj) {
