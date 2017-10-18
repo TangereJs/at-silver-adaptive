@@ -368,7 +368,7 @@
           this._templateCache[view] = lqView;
         }
 
-        if (isString(model)) {
+        if (this._isString(model)) {
           model = JSON.parse(model);
         }
 
@@ -396,7 +396,7 @@
         // merge hostConfig with default config and use that as config
         config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfig);
 
-      } else if (isString(hostConfig)) {
+      } else if (this._isString(hostConfig)) {
         // parse json and merge with default config and use that as config
         try {
           var hostConfigObj = JSON.parse(hostConfig);
