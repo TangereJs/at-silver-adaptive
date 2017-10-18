@@ -351,11 +351,8 @@
     },
 
     _updateRenderedView: function(view, hostConfig, model, modelRoot, placeholder) {
-      function isString(obj) {
-        return Object.prototype.toString.apply(obj) === "[object String]";
-      }
 
-      if (placeholder) {
+      if (this._isString(placeholder)) {
         Polymer.dom(this.$.rcContainer).innerHTML = placeholder;
       }
 
