@@ -1,0 +1,379 @@
+<!doctype html>
+<html>
+
+<head>
+
+  <title>at-silver-adaptive tests</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../iron-test-helpers/test-helpers.js"></script>
+  <script src="../../iron-test-helpers/mock-interactions.js"></script>
+
+  <link rel="import" href="../at-silver-adaptive.html">
+
+</head>
+
+<body>
+
+  <test-fixture id="initialState">
+    <template>
+      <at-silver-adaptive></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <!-- 
+    Fixtures for placeholder property
+   -->
+  <test-fixture id="placeholderIsUndefinedStr">
+    <template>
+      <at-silver-adaptive placeholder="undefined"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholderIsNullStr">
+    <template>
+      <at-silver-adaptive placeholder="null"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholderIsBoolStr">
+    <template>
+      <at-silver-adaptive placeholder="false"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholderIsNumberStr">
+    <template>
+      <at-silver-adaptive placeholder="42"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholderIsObjectStr">
+    <template>
+      <at-silver-adaptive placeholder='{}'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholderIsArrayStr">
+    <template>
+      <at-silver-adaptive placeholder='[]'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholderIsInvalidStr">
+    <template>
+      <at-silver-adaptive placeholder='<div>/div>'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholderIsValidStr">
+    <template>
+      <at-silver-adaptive placeholder='<div></div>'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <!--
+    fixtures for model property
+   -->
+  <test-fixture id="modelIsUndefinedStr">
+    <template>
+      <at-silver-adaptive model="undefined"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelIsNullStr">
+    <template>
+      <at-silver-adaptive model="null"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+    <test-fixture id="modelIsBoolStr">
+    <template>
+      <at-silver-adaptive model="false"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelIsNumberStr">
+    <template>
+      <at-silver-adaptive model="42"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelIsStr">
+    <template>
+      <at-silver-adaptive model="lorem ipsum"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelIsArrayStr">
+    <template>
+      <at-silver-adaptive model='[]'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelIsInvalidObjStr">
+    <template>
+      <at-silver-adaptive model='{ "prop1": "prop1value }'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelIsInvalidObjStr">
+    <template>
+      <at-silver-adaptive model='{ "prop1": "prop1value" }'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <!--
+    fixtures for modelRoot property
+   -->
+  <test-fixture id="modelRootIsUndefinedStr">
+    <template>
+      <at-silver-adaptive model-root="undefined"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelRootIsNullStr">
+    <template>
+      <at-silver-adaptive model-root="null"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+    <test-fixture id="modelRootIsBoolStr">
+    <template>
+      <at-silver-adaptive model-root="false"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelRootIsNumberStr">
+    <template>
+      <at-silver-adaptive model-root="42"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelRootIsArrayStr">
+    <template>
+      <at-silver-adaptive model-root='[]'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelRootIsObjStr">
+    <template>
+      <at-silver-adaptive model-root='{}'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelRootIsInvalidStr">
+    <template>
+      <at-silver-adaptive model-root="lorem ipsum"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="modelRootIsValidStr">
+    <template>
+      <at-silver-adaptive model-root="lorem.ipsum"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+
+  <!-- 
+    Fixtures for view property
+   -->
+  <test-fixture id="viewIsUndefinedStr">
+    <template>
+      <at-silver-adaptive view="undefined"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="viewIsNullStr">
+    <template>
+      <at-silver-adaptive view="null"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="viewIsBoolStr">
+    <template>
+      <at-silver-adaptive view="false"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+  
+  <test-fixture id="viewIsNumberStr">
+    <template>
+      <at-silver-adaptive view="42"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="viewIsObjectStr">
+    <template>
+      <at-silver-adaptive view="{}"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="viewIsArrayStr">
+    <template>
+      <at-silver-adaptive view="[]"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="viewIsInvalidStr">
+    <template>
+      <at-silver-adaptive view='{ "prop1": "prop1val", "prop2": "prop2val" }'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="viewIsValidStr">
+    <template>
+      <at-silver-adaptive view='{ "type": "AdaptiveCard", "version": "1.0.0.0" }'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <!--
+    fixture for property tests
+   -->
+  <test-fixture id="propertyTest">
+    <template>
+      <at-silver-adaptive></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <script>
+    suite('basic', function() {
+
+      function assertPropertyValue(el, pName, pValue) {
+        assert.equal(el[pName], pValue);
+      }
+
+      function assertPropertyValueDeep(el, pName, pValue) {
+        assert.deepEqual(el[pName], pValue); 
+      }
+
+      function assertAttributeValue(el, attrName, attrValue) {
+        var attr = el.getAttribute(attrName);
+        assert.equal(attr, attrValue);
+      }
+
+      var initialPlaceholderValue = '<div class="m"> <div class="placeholder-text"></div><div class="placeholder-text mtsm"></div></div>';
+
+      function assertInitialState(elt) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+
+        // assert innerHTML of elt.$.rcContainer
+        var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+        placeholderHtml = placeholderHtml.replace(/\sstyle-scope/gi, '');
+        placeholderHtml = placeholderHtml.replace(/\sat-silver-adaptive/gi, '');
+        assert.equal(placeholderHtml, initialPlaceholderValue);
+      }
+
+      var invalidPlaceholderStr = '<div>/div>';
+      var validPlaceholderStr = '<div></div>';
+      var invalidModelObjStr = '{ "prop1": "prop1value }';
+      var validModelObjStr = '{ "prop1": "prop1value" }';
+      var invalidModelRootStr = "lorem ipsum";
+      var validModelRootStr = "lorem.ipsum";
+      var invalidViewStr = '{ "prop1": "prop1val", "prop2": "prop2val" }';
+      var validViewStr = '{ "type": "AdaptiveCard", "version": "1.0.0.0" }';
+
+      suite('tests where properties are set as attributes', function() {
+
+        test('test initial state', function() {
+          var elt = fixture('initialState');
+          assertInitialState(elt);
+        });
+
+        test('placeholder is undefined string', function() {
+          var elt = fixture('placeholderIsUndefinedStr');
+          
+          assertPropertyValue(elt, 'view', '{}');
+          assertPropertyValueDeep(elt, 'hostConfig', {});
+          assertPropertyValueDeep(elt, 'model', {});
+          assertPropertyValue(elt, 'modelRoot', '');
+          assertPropertyValue(elt, 'placeholder', "undefined");
+
+          // assert innerHTML of elt.$.rcContainer
+          var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+          assert.equal(placeholderHtml, "undefined");
+        });
+
+        test('placeholder is null string', function() {
+          var elt = fixture('placeholderIsNullStr');
+          
+          assertPropertyValue(elt, 'view', '{}');
+          assertPropertyValueDeep(elt, 'hostConfig', {});
+          assertPropertyValueDeep(elt, 'model', {});
+          assertPropertyValue(elt, 'modelRoot', '');
+          assertPropertyValue(elt, 'placeholder', "null");
+
+          // assert innerHTML of elt.$.rcContainer
+          var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+          assert.equal(placeholderHtml, "null");
+        });
+
+        test('placeholder is bool string', function() {
+          var elt = fixture('placeholderIsBoolStr');
+          
+          assertPropertyValue(elt, 'view', '{}');
+          assertPropertyValueDeep(elt, 'hostConfig', {});
+          assertPropertyValueDeep(elt, 'model', {});
+          assertPropertyValue(elt, 'modelRoot', '');
+          assertPropertyValue(elt, 'placeholder', "false");
+
+          // assert innerHTML of elt.$.rcContainer
+          var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+          assert.equal(placeholderHtml, "false");
+        });
+
+        // bool, number, string, object, array, function
+        
+        // tests for view
+        // invalid view values by type
+        // invalid view values by content
+        // valid view values by type and content
+
+        // tests for hostConfig
+        // invalid view values by type
+        // invalid view values by content
+        // valid view values by type and content
+
+        // tests for model
+        // invalid view values by type
+        // invalid view values by content
+        // valid view values by type and content
+
+        // tests for modelRoot
+        // invalid view values by type
+        // invalid view values by content
+        // valid view values by type and content
+
+        // tests for placeholder
+        // invalid view values by type
+        // invalid view values by content
+        // valid view values by type and content
+
+      });
+
+      suite('tests whrere properties are set in code', function() {
+        
+        test('test initial state', function() {
+          var elt = fixture('propertyTest');
+          assertInitialState(elt);
+        });
+
+
+      });
+
+
+    });
+  </script>
+
+</body>
+
+</html>
