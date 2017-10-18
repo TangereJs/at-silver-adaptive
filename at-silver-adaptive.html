@@ -1,11 +1,12 @@
 <link rel="import" href="../tangere/tangere.html" />
+<link rel="import" href="../at-core-style-classes/at-core-style-classes.html" />
 
 <link rel="import" href="../liquid.js/liquid-import.html">
 <script src="lib/adaptivecards.js"></script>
 
 <dom-module id="at-silver-adaptive">
   <template>
-    <style>
+    <style include="at-core-style-classes">
       :host {
         display: block;
         box-sizing: border-box;
@@ -161,13 +162,13 @@
       },
 
       /**
-       * the data object that will be used to render the liquid template
+       * the model object that will be used to render the liquid template
        * 
-       * @property data
+       * @property model
        * @type Object
        * @default {}
        */
-      data: {
+      model: {
         type: Object,
         value: function() {
           return {};
@@ -176,6 +177,33 @@
         xgridcols: "12",
         maxLines: 0,
         mode: 'application/json'
+      },
+
+      /**
+       * path to the sub-object / value inside .model to use as data to render the liquid template
+       * 
+       * @property modelRoot
+       * @type String
+       * @default ''
+       */
+      modelRoot: {
+        type: String,
+        value: ''
+      },
+
+      /**
+       * html to be used as placeholder while element is rendering the adaptive card content
+       * 
+       * @property placeholder
+       * @type String
+       * @default "<div class='m'> <div class='placeholder-text'></div><div class='placeholder-text mtsm'></div></div>"
+       */
+      placeholder: {
+        type: String,
+        value: "<div class='m'> <div class='placeholder-text'></div><div class='placeholder-text mtsm'></div></div>",
+        xtype: 'code',
+        xgridcols: "12",
+        mode: "html"
       }
     },
 
@@ -188,7 +216,7 @@
     }],
 
     observers: [
-      '_updateRenderedView(view, hostConfig, data)'
+      '_updateRenderedView(view, hostConfig, model, modelRoot, placeholder)'
     ],
 
     ready: function() {
@@ -322,9 +350,13 @@
       }
     },
 
-    _updateRenderedView: function(view, hostConfig, data) {
+    _updateRenderedView: function(view, hostConfig, model, modelRoot, placeholder) {
       function isString(obj) {
         return Object.prototype.toString.apply(obj) === "[object String]";
+      }
+
+      if (placeholder) {
+        Polymer.dom(this.$.rcContainer).innerHTML = placeholder;
       }
 
       if (!view) return;
@@ -339,8 +371,13 @@
           this._templateCache[view] = lqView;
         }
 
-        if (isString(data)) {
-          data = JSON.parse(data);
+        if (isString(model)) {
+          model = JSON.parse(model);
+        }
+
+        var data = model;
+        if (modelRoot) {
+          data = this._getObjPath(data, modelRoot);
         }
 
         var lqJson = lqView.render(data);
@@ -462,6 +499,21 @@
       }
 
       return false;
+    },
+
+    _getObjPath: function (obj, path) {
+      if (!path) return obj;
+      var paths = path.split('.'),
+        current = obj;
+
+      for (var i = 0; i < paths.length; ++i) {
+        if (current[paths[i]] == undefined) {
+          return undefined;
+        } else {
+          current = current[paths[i]];
+        }
+      }
+      return current;
     }
 
   });
