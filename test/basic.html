@@ -123,7 +123,7 @@
     </template>
   </test-fixture>
 
-  <test-fixture id="modelIsInvalidObjStr">
+  <test-fixture id="modelIsValidObjStr">
     <template>
       <at-silver-adaptive model='{ "prop1": "prop1value" }'></at-silver-adaptive>
     </template>
@@ -232,6 +232,57 @@
     </template>
   </test-fixture>
 
+  <!-- 
+    fixtures for hostConfig property
+   -->
+  <test-fixture id="hostConfigIsUndefinedStr">
+    <template>
+      <at-silver-adaptive host-config="undefined"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="hostConfigIsNullStr">
+    <template>
+      <at-silver-adaptive host-config="null"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="hostConfigIsBoolStr">
+    <template>
+      <at-silver-adaptive host-config="false"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="hostConfigIsNumberStr">
+    <template>
+      <at-silver-adaptive host-config="42"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="hostConfigIsObjStr">
+    <template>
+      <at-silver-adaptive host-config="{}"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="hostConfigIsArrayStr">
+    <template>
+      <at-silver-adaptive host-config="[]"></at-silver-adaptive>
+    </template>
+  </test-fixture>
+  
+  <test-fixture id="hostConfigIsInvalidStr">
+    <template>
+      <at-silver-adaptive host-config='{ "prop1": prop1value" }'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="hostConfigIsValidStr">
+    <template>
+      <at-silver-adaptive host-config='{ "prop1": "prop1value" }'></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
   <!--
     fixture for property tests
    -->
@@ -257,6 +308,19 @@
         assert.equal(attr, attrValue);
       }
 
+      var sscopeRegexp1 = /style-scope/gi;
+      var sscopeRegexp2 = /\sstyle-scope/gi;
+      var elNameRegexp = /\sat-silver-adaptive/gi;
+      var ecRegexp = /\sclass=""/gi;
+
+      function removeStyleScoping(source) {
+        source = source.replace(sscopeRegexp1, '');
+        source = source.replace(sscopeRegexp2, '');
+        source = source.replace(elNameRegexp, '');
+        source = source.replace(ecRegexp, '');
+        return source;
+      }
+
       var initialPlaceholderValue = '<div class="m"> <div class="placeholder-text"></div><div class="placeholder-text mtsm"></div></div>';
 
       function assertInitialState(elt) {
@@ -274,13 +338,67 @@
       }
 
       var invalidPlaceholderStr = '<div>/div>';
+      var expectedInvalidPlaceholderStr = '<div>/div&gt;</div>';
       var validPlaceholderStr = '<div></div>';
       var invalidModelObjStr = '{ "prop1": "prop1value }';
       var validModelObjStr = '{ "prop1": "prop1value" }';
+      var validModelObj = { prop1: "prop1value" };
       var invalidModelRootStr = "lorem ipsum";
       var validModelRootStr = "lorem.ipsum";
       var invalidViewStr = '{ "prop1": "prop1val", "prop2": "prop2val" }';
       var validViewStr = '{ "type": "AdaptiveCard", "version": "1.0.0.0" }';
+
+      var invalidViewObj = { prop1: "prop1val", prop2: "prop2val" };
+      var validViewObj = { type: "AdaptiveCard", version: "1.0.0.0" };
+
+      var invalidHostConfigStr = '{ "prop1": prop1value" }';
+      var validHostConfigObj = { "prop1": "prop1value" };
+      var validHostConfigStr = '{ "prop1": "prop1value" }';
+
+      function assertPlaceholderState(elt, pVal, pHtmlVal) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValueDeep(elt, 'placeholder', pVal);
+
+        // assert innerHTML of elt.$.rcContainer
+        var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+        placeholderHtml = removeStyleScoping(placeholderHtml);
+        assert.equal(placeholderHtml, pHtmlVal);
+      }
+
+      function assertModelState(elt, mVal) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', mVal);
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+      }
+
+      function assertModelRootState(elt, mrVal) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValueDeep(elt, 'modelRoot', mrVal);
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+      }
+
+      function assertViewState(elt, vVal) {
+        assertPropertyValueDeep(elt, 'view', vVal);
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+      }
+      
+      function assertHostConfigState(elt, hcVal) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', hcVal);
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+      }
 
       suite('tests where properties are set as attributes', function() {
 
@@ -289,77 +407,225 @@
           assertInitialState(elt);
         });
 
+        //
+        // tests for placeholder
+        //
         test('placeholder is undefined string', function() {
           var elt = fixture('placeholderIsUndefinedStr');
-          
-          assertPropertyValue(elt, 'view', '{}');
-          assertPropertyValueDeep(elt, 'hostConfig', {});
-          assertPropertyValueDeep(elt, 'model', {});
-          assertPropertyValue(elt, 'modelRoot', '');
-          assertPropertyValue(elt, 'placeholder', "undefined");
-
-          // assert innerHTML of elt.$.rcContainer
-          var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
-          assert.equal(placeholderHtml, "undefined");
+          assertPlaceholderState(elt, "undefined", "undefined");
         });
 
         test('placeholder is null string', function() {
           var elt = fixture('placeholderIsNullStr');
-          
-          assertPropertyValue(elt, 'view', '{}');
-          assertPropertyValueDeep(elt, 'hostConfig', {});
-          assertPropertyValueDeep(elt, 'model', {});
-          assertPropertyValue(elt, 'modelRoot', '');
-          assertPropertyValue(elt, 'placeholder', "null");
-
-          // assert innerHTML of elt.$.rcContainer
-          var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
-          assert.equal(placeholderHtml, "null");
+          assertPlaceholderState(elt, "null", "null");
         });
 
         test('placeholder is bool string', function() {
           var elt = fixture('placeholderIsBoolStr');
-          
-          assertPropertyValue(elt, 'view', '{}');
-          assertPropertyValueDeep(elt, 'hostConfig', {});
-          assertPropertyValueDeep(elt, 'model', {});
-          assertPropertyValue(elt, 'modelRoot', '');
-          assertPropertyValue(elt, 'placeholder', "false");
-
-          // assert innerHTML of elt.$.rcContainer
-          var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
-          assert.equal(placeholderHtml, "false");
+          assertPlaceholderState(elt, "false", "false");
         });
 
-        // bool, number, string, object, array, function
+        test('placeholder is number string', function() {
+          var elt = fixture('placeholderIsNumberStr');
+          assertPlaceholderState(elt, "42", "42");
+        });
+
+        test('placeholder is object string', function() {
+          var elt = fixture('placeholderIsObjectStr');
+          assertPlaceholderState(elt, "{}", "{}");
+        });
+
+        test('placeholder is array string', function() {
+          var elt = fixture('placeholderIsArrayStr');
+          assertPlaceholderState(elt, "[]", "[]");
+        });
+
+        test('placeholder is invalid string', function() {
+          var elt = fixture('placeholderIsInvalidStr');
+          assertPlaceholderState(elt, invalidPlaceholderStr, expectedInvalidPlaceholderStr);
+        });
+
+        test('placeholder is valid string', function() {
+          var elt = fixture('placeholderIsValidStr');
+          assertPlaceholderState(elt, validPlaceholderStr, validPlaceholderStr);
+        });
         
-        // tests for view
-        // invalid view values by type
-        // invalid view values by content
-        // valid view values by type and content
 
-        // tests for hostConfig
-        // invalid view values by type
-        // invalid view values by content
-        // valid view values by type and content
-
+        
+        // 
         // tests for model
-        // invalid view values by type
-        // invalid view values by content
-        // valid view values by type and content
+        // 
+        test('model is undefined string', function() {
+          var elt = fixture('modelIsUndefinedStr');
+          assertModelState(elt, 'undefined');
+        });
 
-        // tests for modelRoot
-        // invalid view values by type
-        // invalid view values by content
-        // valid view values by type and content
+        test('model is null string', function() {
+          var elt = fixture('modelIsNullStr');
+          assertModelState(elt, null);
+        });
 
-        // tests for placeholder
-        // invalid view values by type
-        // invalid view values by content
-        // valid view values by type and content
+        test('model is bool string', function() {
+          var elt = fixture('modelIsBoolStr');
+          assertModelState(elt, false);
+        });
 
+        test('model is number string', function() {
+          var elt = fixture('modelIsNumberStr');
+          assertModelState(elt, 42);
+        });
+
+        test('model is string', function() {
+          var elt = fixture('modelIsStr');
+          assertModelState(elt, 'lorem ipsum');
+        });
+
+        test('model is array string', function() {
+          var elt = fixture('modelIsArrayStr');
+          assertModelState(elt, []);
+        });
+
+        test('model is invalid obj string', function() {
+          var elt = fixture('modelIsInvalidObjStr');
+          assertModelState(elt, invalidModelObjStr);
+        });
+
+        test('model is valid obj string', function() {
+          var elt = fixture('modelIsValidObjStr');
+          assertModelState(elt, validModelObj);
+        });
+        
+        //
+        // Tests for model root
+        //
+        test('modelRoot is undefined string', function() {
+          var elt = fixture('modelRootIsUndefinedStr');
+          assertModelRootState(elt, 'undefined');
+        });
+
+        test('modelRoot is null string', function() {
+          var elt = fixture('modelRootIsNullStr');
+          assertModelRootState(elt, 'null');
+        });
+
+        test('modelRoot is bool string', function() {
+          var elt = fixture('modelRootIsBoolStr');
+          assertModelRootState(elt, 'false');
+        });
+
+        test('modelRoot is number string', function() {
+          var elt = fixture('modelRootIsNumberStr');
+          assertModelRootState(elt, '42');
+        });
+
+        test('modelRoot is array string', function() {
+          var elt = fixture('modelRootIsArrayStr');
+          assertModelRootState(elt, '[]');
+        });
+
+        test('modelRoot is object string', function() {
+          var elt = fixture('modelRootIsObjStr');
+          assertModelRootState(elt, '{}');
+        });
+        
+        test('modelRoot is invalid string', function() {
+          var elt = fixture('modelRootIsInvalidStr');
+          assertModelRootState(elt, 'lorem ipsum');
+        });
+
+        test('modelRoot is valid string', function() {
+          var elt = fixture('modelRootIsValidStr');
+          assertModelRootState(elt, 'lorem.ipsum');
+        });
+
+        //
+        // Tests for view
+        //
+        test('view is undefined string', function() {
+          var elt = fixture('viewIsUndefinedStr');
+          assertViewState(elt, 'undefined');
+        });
+
+        test('view is null string', function() {
+          var elt = fixture('viewIsNullStr');
+          assertViewState(elt, 'null');
+        });
+
+        test('view is bool string', function() {
+          var elt = fixture('viewIsBoolStr');
+          assertViewState(elt, 'false');
+        });
+
+        test('view is number string', function() {
+          var elt = fixture('viewIsNumberStr');
+          assertViewState(elt, '42');
+        });
+
+        test('view is object string', function() {
+          var elt = fixture('viewIsObjectStr');
+          assertViewState(elt, '{}');
+        });
+
+        test('view is array string', function() {
+          var elt = fixture('viewIsArrayStr');
+          assertViewState(elt, '[]');
+        });
+
+        test('view is invalid string', function() {
+          var elt = fixture('viewIsInvalidStr');
+          assertViewState(elt, invalidViewStr);
+        });
+
+        test('view is valid string', function() {
+          var elt = fixture('viewIsValidStr');
+          assertViewState(elt, validViewStr);
+        });
+
+        //
+        // tests for hostConfig
+        //
+        test('hostConfig is undefined string', function() {
+          var elt = fixture('hostConfigIsUndefinedStr');
+          assertHostConfigState(elt, 'undefined');
+        });
+
+        test('hostConfig is null string', function() {
+          var elt = fixture('hostConfigIsNullStr');
+          assertHostConfigState(elt, null);
+        });
+
+        test('hostConfig is bool string', function() {
+          var elt = fixture('hostConfigIsBoolStr');
+          assertHostConfigState(elt, false);
+        });
+
+        test('hostConfig is number string', function() {
+          var elt = fixture('hostConfigIsNumberStr');
+          assertHostConfigState(elt, 42);
+        });
+
+        test('hostConfig is object string', function() {
+          var elt = fixture('hostConfigIsObjStr');
+          assertHostConfigState(elt, {});
+        });
+
+        test('hostConfig is array string', function() {
+          var elt = fixture('hostConfigIsArrayStr');
+          assertHostConfigState(elt, []);
+        });
+
+        test('hostConfig is invalid string', function() {
+          var elt = fixture('hostConfigIsInvalidStr');
+          assertHostConfigState(elt, invalidHostConfigStr);
+        });
+
+        test('hostConfig is valid string', function() {
+          var elt = fixture('hostConfigIsValidStr');
+          assertHostConfigState(elt, validHostConfigObj);
+        });
+        
       });
-
+      
       suite('tests whrere properties are set in code', function() {
         
         test('test initial state', function() {
@@ -367,9 +633,483 @@
           assertInitialState(elt);
         });
 
+        //
+        // Tests for placeholder
+        //
+        test('placeholder is undefined string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = "undefined";
+          assertPlaceholderState(elt, 'undefined', 'undefined');
+
+          elt.placeholder = undefined;
+          assertPlaceholderState(elt, undefined, 'undefined');
+        });
+
+        test('placeholder is null string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = "null";
+          assertPlaceholderState(elt, 'null', 'null');
+
+          elt.placeholder = null;
+          assertPlaceholderState(elt, null, 'null');
+        });
+
+        test('placeholder is bool string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = "false";
+          assertPlaceholderState(elt, 'false', 'false');
+
+          elt.placeholder = false;
+          assertPlaceholderState(elt, false, 'false');
+        });
+
+        test('placeholder is number string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = "42";
+          assertPlaceholderState(elt, '42', '42');
+
+          elt.placeholder = 42;
+          assertPlaceholderState(elt, 42, '42');
+        });
+
+        test('placeholder is object string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = "{}";
+          assertPlaceholderState(elt, '{}', '{}');
+
+          elt.placeholder = {};
+          assertPlaceholderState(elt, {}, '{}');
+        });
+
+        test('placeholder is array string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = "[]";
+          assertPlaceholderState(elt, '[]', '[]');
+
+          elt.placeholder = [];
+          assertPlaceholderState(elt, [], '[]');
+        });
+
+        test('placeholder is invalid string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = invalidPlaceholderStr;
+          assertPlaceholderState(elt, invalidPlaceholderStr, expectedInvalidPlaceholderStr);
+        });
+
+        test('placeholder is valid string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.placeholder = validPlaceholderStr;
+          assertPlaceholderState(elt, validPlaceholderStr, validPlaceholderStr);
+        });
+        
+
+        //
+        // Tests for model
+        //
+        test('model is undefined string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = "undefined";
+          assertModelState(elt, 'undefined');
+
+          elt.model = undefined;
+          assertModelState(elt, undefined);
+        });
+
+        test('model is null string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = "null";
+          assertModelState(elt, 'null');
+
+          elt.model = null;
+          assertModelState(elt, null);
+        });
+
+        test('model is bool string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = "false";
+          assertModelState(elt, 'false');
+
+          elt.model = false;
+          assertModelState(elt, false);
+        });
+
+        test('model is number string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = "42";
+          assertModelState(elt, '42');
+
+          elt.model = 42;
+          assertModelState(elt, 42);
+        });
+
+        test('model is string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = "lorem ipsum";
+          assertModelState(elt, 'lorem ipsum');
+        });
+
+        test('model is array string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = "[]";
+          assertModelState(elt, '[]');
+
+          elt.model = [];
+          assertModelState(elt, []);
+        });
+
+        test('model is invalid object string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = invalidModelObjStr;
+          assertModelState(elt, invalidModelObjStr);
+
+          elt.model = {};
+          assertModelState(elt, {});
+        });
+
+        test('model is object string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.model = validModelObjStr;
+          assertModelState(elt, validModelObjStr);
+
+          elt.model = validModelObj;
+          assertModelState(elt, validModelObj);
+        });
+
+        // 
+        // tests for model root
+        // 
+        test('model root is undefined string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.modelRoot = 'undefined';
+          assertModelRootState(elt, 'undefined');
+
+          elt.modelRoot = undefined;
+          assertModelRootState(elt, undefined);
+        });
+
+        test('modelRoot is null string', function() {
+          var elt = fixture('propertyTest');
+
+          assertInitialState(elt);
+
+          elt.modelRoot = 'null';
+          assertModelRootState(elt, 'null');
+
+          elt.modelRoot = null;
+          assertModelRootState(elt, null);
+        });
+
+        test('modelRoot is bool string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.modelRoot = 'false';
+          assertModelRootState(elt, 'false');
+
+          elt.modelRoot = false;
+          assertModelRootState(elt, false);
+        });
+
+        test('modelRoot is number string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.modelRoot = '42';
+          assertModelRootState(elt, '42');
+
+          elt.modelRoot = 42;
+          assertModelRootState(elt, 42);
+        });
+
+        test('modelRoot is array string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.modelRoot = '[]';
+          assertModelRootState(elt, '[]');
+
+          elt.modelRoot = [];
+          assertModelRootState(elt, []);
+        });
+
+        test('modelRoot is object string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.modelRoot = '{}';
+          assertModelRootState(elt, '{}');
+
+          elt.modelRoot = {};
+          assertModelRootState(elt, {});
+        });
+        
+        test('modelRoot is invalid string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.modelRoot = 'lorem ipsum';
+          assertModelRootState(elt, 'lorem ipsum');
+        });
+
+        test('modelRoot is valid string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.modelRoot = 'lorem.ipsum';
+          assertModelRootState(elt, 'lorem.ipsum');
+        });
+        
+
+        test('view is undefined string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.view = 'undefined';
+          assertViewState(elt, 'undefined');
+
+          elt.view = undefined;
+          assertViewState(elt, undefined);
+        });
+
+        test('view is null string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.view = 'null';
+          assertViewState(elt, 'null');
+
+          elt.view = null;
+          assertViewState(elt, null);
+        });
+
+        test('view is bool string', function() {
+          var elt = fixture('propertyTest');
+                    
+          assertInitialState(elt);
+
+          elt.view = 'false';
+          assertViewState(elt, 'false');
+
+          elt.view = false;
+          assertViewState(elt, false);
+        });
+
+        test('view is number string', function() {
+          var elt = fixture('propertyTest');
+                    
+          assertInitialState(elt);
+
+          elt.view = '42';
+          assertViewState(elt, '42');
+
+          elt.view = 42;
+          assertViewState(elt, 42);
+        });
+
+        test('view is object string', function() {
+          var elt = fixture('propertyTest');
+                    
+          assertInitialState(elt);
+
+          elt.view = '{}';
+          assertViewState(elt, '{}');
+
+          elt.view = {};
+          assertViewState(elt, {});
+        });
+
+        test('view is array string', function() {
+          var elt = fixture('propertyTest');
+
+          assertInitialState(elt);
+
+          elt.view = '[]';
+          assertViewState(elt, '[]');
+
+          elt.view = [];
+          assertViewState(elt, []);
+        });
+
+        test('view is invalid string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.view = invalidViewStr;
+          assertViewState(elt, invalidViewStr);
+
+          elt.view = invalidViewObj;
+          assertViewState(elt, invalidViewObj);
+        });
+
+        test('view is valid string', function() {
+          var elt = fixture('propertyTest');
+
+          assertInitialState(elt);
+
+          elt.view = validViewStr;
+          assertViewState(elt, validViewStr);
+
+          elt.view = validViewObj;
+          assertViewState(elt, validViewObj);
+        });
+
+        //
+        // tests for hostConfig
+        //
+        test('hostConfig is undefined string', function() {
+          var elt = fixture('propertyTest');
+
+          assertInitialState(elt);
+
+          elt.hostConfig = 'undefined';
+          assertHostConfigState(elt, 'undefined');
+
+          elt.hostConfig = undefined;
+          assertHostConfigState(elt, undefined);
+        });
+
+        test('hostConfig is null string', function() {
+          var elt = fixture('propertyTest');
+
+          assertInitialState(elt);
+
+          elt.hostConfig = 'null';
+          assertHostConfigState(elt, 'null');
+
+          elt.hostConfig = null;
+          assertHostConfigState(elt, null);
+        });
+
+        test('hostConfig is bool string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.hostConfig = 'false';
+          assertHostConfigState(elt, 'false');
+
+          elt.hostConfig = false;
+          assertHostConfigState(elt, false);
+        });
+
+        test('hostConfig is number string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.hostConfig = '42';
+          assertHostConfigState(elt, '42');
+
+          elt.hostConfig = 42;
+          assertHostConfigState(elt, 42);
+        });
+
+        test('hostConfig is object string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.hostConfig = '{}';
+          assertHostConfigState(elt, '{}');
+
+          elt.hostConfig = {};
+          assertHostConfigState(elt, {});
+        });
+
+        test('hostConfig is array string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.hostConfig = '[]';
+          assertHostConfigState(elt, '[]');
+
+          elt.hostConfig = [];
+          assertHostConfigState(elt, []);
+        });
+
+        test('hostConfig is invalid string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.hostConfig = invalidHostConfigStr;
+          assertHostConfigState(elt, invalidHostConfigStr);
+        });
+
+        test('hostConfig is valid string', function() {
+          var elt = fixture('propertyTest');
+          
+          assertInitialState(elt);
+
+          elt.hostConfig = validHostConfigStr;
+          assertHostConfigState(elt, validHostConfigStr);
+
+          elt.hostConfig = validHostConfigObj;
+          assertHostConfigState(elt, validHostConfigObj);
+        });
 
       });
-
 
     });
   </script>

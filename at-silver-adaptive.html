@@ -219,9 +219,7 @@
       '_updateRenderedView(view, hostConfig, model, modelRoot, placeholder)'
     ],
 
-    ready: function() {
-      this._templateCache = templateCache;
-    },
+    ready: function() { },
 
     // TODO(ij): add more properties to default host config as necessary
     // reference url: https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig
@@ -361,6 +359,9 @@
 
       try {
 
+        if (!this._templateCache) {
+          this._templateCache = templateCache;
+        }
         var lqView = this._templateCache[view];
 
         if (!lqView) {
@@ -382,13 +383,23 @@
         view = JSON.parse(lqJson);
 
       } catch (e) {
-        // console.log(e);
+        console.log(e);
         return;
       }
 
+      // when liquid.parse parses the view string, if view is 'undefined' or 'null' that is falsy and processing should stop
+      if (!view) return;
+      
+      // NOTE. In IE11 Object.keys(Number) throws an error
       // ignore empty views
-      var viewKeys = Object.keys(view);
-      if (!viewKeys.length) return;
+      try {
+        var viewKeys = Object.keys(view);
+        if (!viewKeys.length) return;
+      } catch(e) { 
+        console.log(e);
+        // view is invalid 
+        return;
+      }
 
       var config = this._DEFAULT_HOST_CONFIG;
       
@@ -416,10 +427,16 @@
       var adaptiveCard = new AdaptiveCards.AdaptiveCard();
       adaptiveCard.hostConfig = config;
       adaptiveCard.parse(view);
-      var renderedCard = adaptiveCard.render();
+      
+      try {
+        var renderedCard = adaptiveCard.render();
+        
+        Polymer.dom(this.$.rcContainer).innerHTML = "";
+        Polymer.dom(this.$.rcContainer).appendChild(renderedCard);
 
-      Polymer.dom(this.$.rcContainer).innerHTML = "";
-      Polymer.dom(this.$.rcContainer).appendChild(renderedCard);
+      } catch(e) {
+        console.log(e);
+      }
     },
 
     _handleOnAnchorClicked: function(event) {
