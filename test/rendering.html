@@ -1,0 +1,313 @@
+<!doctype html>
+<html>
+
+<head>
+
+  <title>at-silver-adaptive tests</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../iron-test-helpers/test-helpers.js"></script>
+  <script src="../../iron-test-helpers/mock-interactions.js"></script>
+
+  <link rel="import" href="../at-silver-adaptive.html">
+
+</head>
+
+<body>
+
+  <!--
+    fixture for property tests
+   -->
+  <test-fixture id="propertyTest">
+    <template>
+      <at-silver-adaptive></at-silver-adaptive>
+    </template>
+  </test-fixture>
+
+  <script>
+    suite('rendering tests', function() {
+
+      function assertPropertyValue(el, pName, pValue) {
+        assert.equal(el[pName], pValue);
+      }
+
+      function assertPropertyValueDeep(el, pName, pValue) {
+        assert.deepEqual(el[pName], pValue); 
+      }
+
+      function assertAttributeValue(el, attrName, attrValue) {
+        var attr = el.getAttribute(attrName);
+        assert.equal(attr, attrValue);
+      }
+
+      var sscopeRegexp1 = /style-scope/gi;
+      var sscopeRegexp2 = /\sstyle-scope/gi;
+      var elNameRegexp = /\sat-silver-adaptive/gi;
+      var ecRegexp = /\sclass=""/gi;
+
+      function removeStyleScoping(source) {
+        source = source.replace(sscopeRegexp2, '');
+        source = source.replace(sscopeRegexp1, '');
+        source = source.replace(elNameRegexp, '');
+        source = source.replace(ecRegexp, '');
+        return source;
+      }
+
+      var initialPlaceholderValue = '<div class="m"> <div class="placeholder-text"></div><div class="placeholder-text mtsm"></div></div>';
+
+      function assertInitialState(elt) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+
+        // assert innerHTML of elt.$.rcContainer
+        var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+        placeholderHtml = placeholderHtml.replace(/\sstyle-scope/gi, '');
+        placeholderHtml = placeholderHtml.replace(/\sat-silver-adaptive/gi, '');
+        assert.equal(placeholderHtml, initialPlaceholderValue);
+      }
+
+      var invalidPlaceholderStr = '<div>/div>';
+      var expectedInvalidPlaceholderStr = '<div>/div&gt;</div>';
+      var validPlaceholderStr = '<div></div>';
+      var invalidModelObjStr = '{ "prop1": "prop1value }';
+      var validModelObjStr = '{ "prop1": "prop1value" }';
+      var validModelObj = { prop1: "prop1value" };
+      var invalidModelRootStr = "lorem ipsum";
+      var validModelRootStr = "lorem.ipsum";
+      var invalidViewStr = '{ "prop1": "prop1val", "prop2": "prop2val" }';
+      var validViewStr = '{ "type": "AdaptiveCard", "version": "1.0.0.0", "body": [ { "type": "TextBlock", "text": "Here is a ninja cat" }] }';
+
+      var invalidViewObj = { prop1: "prop1val", prop2: "prop2val" };
+      var validViewObj = { type: "AdaptiveCard", version: "1.0.0.0", body: [ { type: "TextBlock", text: "Here is a ninja cat" }] };
+
+      var invalidHostConfigStr = '{ "prop1": prop1value" }';
+      var validHostConfigObj = { "prop1": "prop1value" };
+      var validHostConfigStr = '{ "prop1": "prop1value" }';
+
+      function assertPlaceholderState(elt, pVal, pHtmlVal) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValueDeep(elt, 'placeholder', pVal);
+
+        // assert innerHTML of elt.$.rcContainer
+        var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+        placeholderHtml = removeStyleScoping(placeholderHtml);
+        assert.equal(placeholderHtml, pHtmlVal);
+      }
+
+      function assertModelState(elt, mVal, vVal, pVal) {
+        assertPropertyValue(elt, 'view', vVal);
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', mVal);
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', pVal);
+      }
+
+      function assertModelRootState(elt, mrVal) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValueDeep(elt, 'modelRoot', mrVal);
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+      }
+
+      function assertViewState(elt, vVal, pVal) {
+        assertPropertyValueDeep(elt, 'view', vVal);
+        assertPropertyValueDeep(elt, 'hostConfig', {});
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', pVal);
+      }
+      
+      function assertHostConfigState(elt, hcVal) {
+        assertPropertyValue(elt, 'view', '{}');
+        assertPropertyValueDeep(elt, 'hostConfig', hcVal);
+        assertPropertyValueDeep(elt, 'model', {});
+        assertPropertyValue(elt, 'modelRoot', '');
+        assertPropertyValue(elt, 'placeholder', initialPlaceholderValue);
+      }
+
+      test('rendering test', function() {
+        var elt = fixture('propertyTest');
+
+        assertInitialState(elt);
+
+        // setting non string placeholder should not set placeholder
+        // can only be done in code, attribute always gives string
+        var invalidPlaceholderValues = [ undefined, null, true, false, 42, -42, 0, [], {}, function() { return null; } ];
+
+        invalidPlaceholderValues.forEach(function(placeholder) {
+          elt.placeholder = placeholder;
+          assertPlaceholderState(elt, placeholder, initialPlaceholderValue);
+        });
+
+        // initially view is empty so, placeholder should not be replaced
+        elt.placeholder = validPlaceholderStr;
+        assertPlaceholderState(elt, validPlaceholderStr, validPlaceholderStr);
+
+        // if view is falsy [ false, null, undefined or 0 ]
+        var falseViewValues = [ false, null, undefined, 0, '' ];
+        // or truthy value but not string
+        var nonStringViewValues = [ true, 42, -42, [], {}, function() { return null; } ];
+
+        // placeholder should not be changed
+        falseViewValues.forEach(function(view) { 
+          elt.view = view;
+          assertViewState(elt, view, validPlaceholderStr);
+        });
+
+        nonStringViewValues.forEach(function(view) { 
+          elt.view = view;
+          assertViewState(elt, view, validPlaceholderStr);
+        });
+
+        // if view is not a valid liquid template/json string placeholder should not be changed
+        var invalidViewStrValues = [
+          "lorem ipsum",
+          '{ "prop1": "prop1val", prop2": "prop2val }',
+          '{ "prop1": "prop1val {% invalid }}", "prop2": "prop2val" }',
+          '{ "prop1": "prop1val", "prop2{% invalid }}": "prop2val" }'
+        ];
+
+        invalidViewStrValues.forEach(function(view) {
+          elt.view = view;
+          assertViewState(elt, view, validPlaceholderStr);
+        });
+
+        // set valid view string
+        elt.view = validViewStr;
+
+        assertViewState(elt, validViewStr, validPlaceholderStr);
+
+        // if model is a string but not a json string; json.parse will fail and function will return
+        // with invalid models placeholder will not be changed
+        var invalidModelStrValues = [ "lorem ipsum", '{ "prop1": "prop1val }', '{ "prop1": "prop1val" ' ];
+
+        invalidModelStrValues.forEach(function(model) { 
+          elt.model = model;
+          assertModelState(elt, model, validViewStr, validPlaceholderStr);
+        });
+
+        // if model is not an object liquid.render does not fail
+        invalidModelValues = [ null, undefined, true, false, 42, -42, 0, [], function() { return null; } ];
+        invalidModelValues.forEach(function(model) { 
+          elt.model = model;
+          assertModelState(elt, model, validViewStr, validPlaceholderStr);
+        });
+
+        // if model is not an object and modelRoot is set _getObjPath will fail
+        elt.modelRoot = "prop1";
+        assertPropertyValue(elt, 'modelRoot', 'prop1');
+
+        invalidModelValues.forEach(function(model) { 
+          elt.model = model;
+
+          assertPropertyValue(elt, 'view', validViewStr);
+          assertPropertyValueDeep(elt, 'hostConfig', {});
+          assertPropertyValueDeep(elt, 'model', model);
+          assertPropertyValue(elt, 'modelRoot', 'prop1');
+          assertPropertyValue(elt, 'placeholder', validPlaceholderStr);
+        });
+
+        elt.model = validModelObj;
+        assertPropertyValueDeep(elt, 'model', validModelObj);
+
+        // we have valid placeholder, view and valid model set
+
+        // placeholder should be replaced with renderedCard
+        var placeholderHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+        placeholderHtml = removeStyleScoping(placeholderHtml);
+        assert.notEqual(placeholderHtml, validPlaceholderStr);
+
+        // placeholderHtml should be the rendered card
+        var ac = new AdaptiveCards.AdaptiveCard();
+        ac.hostConfig = elt._DEFAULT_HOST_CONFIG;
+        ac.parse(validViewObj);
+        var rc = ac.render();
+
+        assert.equal(placeholderHtml, rc.outerHTML);
+
+        // lets tinker with hostConfig
+
+        // by default _DEFAULT_HOST_CONFIG is used
+        var invalidHostConfigValues = [ undefined, null, true, false, 42, -42, 0, [], function() { return null; } ];
+        invalidHostConfigValues.forEach(function(hostConfig) { 
+          elt.hostConfig = hostConfig;
+
+          var acHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+          acHtml = removeStyleScoping(acHtml);
+
+          var ac = new AdaptiveCards.AdaptiveCard();
+          ac.hostConfig = elt._DEFAULT_HOST_CONFIG;
+          ac.parse(validViewObj);
+          var rc = ac.render();
+
+          assert.equal(acHtml, rc.outerHTML);
+        });
+
+        var invalidHostConfigStrValues = [ "lorem ipsum", "undefined", "null", '{ "prop1": "prop1Val }' ];
+        invalidHostConfigStrValues.forEach(function(hostConfig){
+          elt.hostConfig = hostConfig;
+
+          var acHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+          acHtml = removeStyleScoping(acHtml);
+
+          var ac = new AdaptiveCards.AdaptiveCard();
+          ac.hostConfig = elt._DEFAULT_HOST_CONFIG;
+          ac.parse(validViewObj);
+          var rc = ac.render();
+
+          assert.equal(acHtml, rc.outerHTML);           
+        });
+
+        // lets give elt a host config that doesn't override any default values
+        var validHostConfig = {
+          prop1: "prop1Value"
+        };
+        elt.hostConfig = validHostConfig;
+
+        var acHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+        acHtml = removeStyleScoping(acHtml);
+
+        var ac = new AdaptiveCards.AdaptiveCard();
+        ac.hostConfig = elt._DEFAULT_HOST_CONFIG;
+        ac.parse(validViewObj);
+        var rc = ac.render();
+
+        assert.equal(acHtml, rc.outerHTML);
+
+        // lets give elt a host config that does override a default value
+        var validHostConfig = {
+          fontFamily: 'Consolas'
+        };
+        elt.hostConfig = validHostConfig;
+
+        var acHtml = Polymer.dom(elt.$.rcContainer).innerHTML;
+        acHtml = removeStyleScoping(acHtml);
+
+        var ac = new AdaptiveCards.AdaptiveCard();
+        ac.hostConfig = elt._computeHostConfig(validHostConfig);
+        ac.parse(validViewObj);
+        var rc = ac.render();
+
+        assert.equal(acHtml, rc.outerHTML);
+
+      });
+
+    });
+  </script>
+
+</body>
+
+</html>

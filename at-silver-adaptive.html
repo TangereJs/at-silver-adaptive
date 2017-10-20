@@ -401,19 +401,7 @@
         return;
       }
 
-      var config = this._DEFAULT_HOST_CONFIG;
-      
-      if (this._isObject(hostConfig)) {
-        // merge hostConfig with default config and use that as config
-        config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfig);
-
-      } else if (this._isString(hostConfig)) {
-        // parse json and merge with default config and use that as config
-        try {
-          var hostConfigObj = JSON.parse(hostConfig);
-          config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfigObj);
-        } catch (e) { console.log(e); }
-      }
+      var config = this._computeHostConfig(hostConfig);
 
       // onAnchorClicked is used because links can be present on the card
       AdaptiveCards.AdaptiveCard.onAnchorClicked = this._handleOnAnchorClicked.bind(this);
@@ -452,6 +440,23 @@
     _handleOnInlineCardExpanded: function(event) {
 
       this._applyStyleScopeToAdaptiveCard();
+    },
+
+    _computeHostConfig: function(hostConfig) {
+      var config = this._DEFAULT_HOST_CONFIG;
+      
+      if (this._isObject(hostConfig)) {
+        // merge hostConfig with default config and use that as config
+        config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfig);
+
+      } else if (this._isString(hostConfig)) {
+        // parse json and merge with default config and use that as config
+        try {
+          var hostConfigObj = JSON.parse(hostConfig);
+          config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfigObj);
+        } catch (e) { console.log(e); }
+      }
+      return config;
     },
 
     _applyStyleScopeToAdaptiveCard: function() {
