@@ -1,8 +1,9 @@
 <link rel="import" href="../tangere/tangere.html" />
 <link rel="import" href="../at-core-style-classes/at-core-style-classes.html" />
 
-<link rel="import" href="../liquid.js/liquid-import.html">
-<script src="lib/adaptivecards.js"></script>
+<script src="lib/markdown-it.10.0.0.min.js"></script>
+<script src="lib/adaptivecards-templating.0.1.1-alpha.0.js"></script>
+<script src="lib/adaptivecards.1.2.5.js"></script>
 
 <dom-module id="at-silver-adaptive">
   <template>
@@ -221,7 +222,7 @@
 
     ready: function() { },
 
-    // TODO(ij): add more properties to default host config as necessary
+    // TODO add more properties to default host config as necessary
     // reference url: https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig
     _DEFAULT_HOST_CONFIG: {
       spacing: {
@@ -237,7 +238,7 @@
         lineColor: "#EEEEEE"
       },
       supportsInteractivity: true,
-      fontFamily: "Segoe UI",
+      fontFamily: "Segoe UI", 
       fontSizes: {
         small: 12,
         default: 14,
@@ -348,73 +349,58 @@
       }
     },
 
-    _updateRenderedView: function(view, hostConfig, model, modelRoot, placeholder) {
+    _updateRenderedView: function(_view, hostConfig, _model, modelRoot, placeholder) {
 
+      var view = _view, model = _model;
       if (this._isString(placeholder)) {
         Polymer.dom(this.$.rcContainer).innerHTML = placeholder;
       }
 
-      if (!view) return;
-      if (!this._isString(view)) return;
+      if (!view || !this.model) return;      
 
       try {
-
-        if (!this._templateCache) {
-          this._templateCache = templateCache;
-        }
-        var lqView = this._templateCache[view];
-
-        if (!lqView) {
-          lqView = Liquid.parse(view);
-          this._templateCache[view] = lqView;
-        }
-
-        if (this._isString(model)) {
-          model = JSON.parse(model);
-        }
-
+        
+        if (this._isString(_view)) view = JSON.parse(_view);        
+        if (this._isString(_model)) model = JSON.parse(_model);
+        
         var data = model;
         if (modelRoot) {
           data = this._getObjPath(data, modelRoot);
         }
+          
+        // Create a Template instamce from the template payload
+        var template = new ACData.Template(view);
 
-        var lqJson = lqView.render(data);
-        
-        view = JSON.parse(lqJson);
+        // Create a data binding context, and set its $root property to the
+        // data object to bind the template to
+        var context = new ACData.EvaluationContext();
+        context.$root = data;
 
+        // "Expand" the template - this generates the final Adaptive Card,
+        // ready to render
+        var card = template.expand(context);
+
+        // Render the card
+        var adaptiveCard = new AdaptiveCards.AdaptiveCard();
+        adaptiveCard.parse(card);
+       
       } catch (e) {
         console.log(e);
         return;
-      }
-
-      // when liquid.parse parses the view string, if view is 'undefined' or 'null' that is falsy and processing should stop
-      if (!view) return;
+      }            
       
-      // NOTE. In IE11 Object.keys(Number) throws an error
-      // ignore empty views
-      try {
-        var viewKeys = Object.keys(view);
-        if (!viewKeys.length) return;
-      } catch(e) { 
-        console.log(e);
-        // view is invalid 
-        return;
-      }
-
-      var config = this._computeHostConfig(hostConfig);
+      var config = this._computeHostConfig(hostConfig);      
 
       // onAnchorClicked is used because links can be present on the card
-      AdaptiveCards.AdaptiveCard.onAnchorClicked = this._handleOnAnchorClicked.bind(this);
+      adaptiveCard.onAnchorClicked = this._handleOnAnchorClicked.bind(this);
 
       // onExecuteAction is used because one can click view button on the card
-      AdaptiveCards.AdaptiveCard.onExecuteAction = this._handleCardExecuteAction.bind(this);
+      adaptiveCard.onExecuteAction = this._handleCardExecuteAction.bind(this);
 
       // onInlineCardExpanded is used becuase some buttons show/hide parts of the card
-      AdaptiveCards.AdaptiveCard.onInlineCardExpanded = this._handleOnInlineCardExpanded.bind(this);
-
-      var adaptiveCard = new AdaptiveCards.AdaptiveCard();
-      adaptiveCard.hostConfig = config;
-      adaptiveCard.parse(view);
+      adaptiveCard.onInlineCardExpanded = this._handleOnInlineCardExpanded.bind(this);
+     
+      Object.assign(config,  adaptiveCard.hostConfig);      
       
       try {
         var renderedCard = adaptiveCard.render();
