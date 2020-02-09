@@ -349,6 +349,13 @@
       }
     },
 
+    actionListener: function(event) {
+
+      var model = event.detail.model.state.model;
+      this.model = model;
+
+    },
+
     _updateRenderedView: function(_view, hostConfig, _model, modelRoot, placeholder) {
 
       var view = _view, model = _model;

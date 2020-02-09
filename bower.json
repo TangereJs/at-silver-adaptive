@@ -1,0 +1,8 @@
+{
+  "name": "at-silver-adaptive",
+  "version": "0.0.1.0",
+  "private": true,
+  "dependencies": {
+    "polymer": "Polymer/polymer#master"
+  }
+}
