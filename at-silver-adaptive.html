@@ -1,9 +1,12 @@
 <link rel="import" href="../tangere/tangere.html" />
 <link rel="import" href="../at-core-style-classes/at-core-style-classes.html" />
+<link rel="import" href="../at-core-activity-queue/at-core-activity-queue.html" />
+<link rel="import" href="../at-core-spinner/at-core-spinner.html" />
+<link rel="import" href="../at-core-activity/at-core-activity.html">
 
 <script src="lib/markdown-it.10.0.0.min.js"></script>
-<script src="lib/adaptivecards-templating.0.1.1-alpha.0.js"></script>
-<script src="lib/adaptivecards.1.2.5.js"></script>
+<script src="lib/adaptivecards-templating.min.js"></script>
+<script src="lib/adaptivecards.min.js"></script>
 
 <dom-module id="at-silver-adaptive">
   <template>
@@ -13,521 +16,765 @@
         box-sizing: border-box;
       }
 
+      .ac-media-poster {
+      }
+
+        .ac-media-poster.empty {
+          height: 200px;
+          background-color: #F2F2F2;
+        }
+
+      .ac-media-playButton {
+        width: 56px;
+        height: 56px;
+        border: 1px solid #EEEEEE;
+        border-radius: 28px;
+        box-shadow: 0px 0px 10px #EEEEEE;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: black;
+        cursor: pointer;
+      }
+
+      .ac-media-playButton-arrow {
+        color: black;
+      }
+
+      .ac-media-playButton:hover {
+        background-color: white;
+      }
+
       .ac-image.ac-selectable {
         cursor: pointer;
       }
+
+        .ac-image.ac-selectable:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .ac-image.ac-selectable:active {
+          background-color: rgba(0, 0, 0, 0.15);
+        }
 
       a.ac-anchor {
         text-decoration: none;
       }
 
-      a.ac-anchor:link {
-        color: #005A9E;
-      }
+        a.ac-anchor:link {
+          color: #005a9e;
+        }
 
-      a.ac-anchor:visited {
-        color: #005A9E;
-      }
+        a.ac-anchor:visited {
+          color: #005a9e;
+        }
 
-      a.ac-anchor:link:active {
-        color: #004D84;
-      }
+        a.ac-anchor:link:active {
+          color: #004d84;
+        }
 
-      a.ac-anchor:visited:active {
-        color: #004D84;
-      }
+        a.ac-anchor:visited:active {
+          color: #004d84;
+        }
 
-      .ac-container.ac-selectable {
+      .ac-container.ac-selectable, .ac-columnSet.ac-selectable {
         padding: 0px;
       }
 
-      .ac-container.ac-selectable:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-      }
+        .ac-container.ac-selectable:hover, .ac-columnSet.ac-selectable:hover {
+          background-color: rgba(0, 0, 0, 0.1) !important;
+        }
 
-      .ac-container.ac-selectable:active {
-        background-color: rgba(0, 0, 0, 0.15);
-      }
+        .ac-container.ac-selectable:active, .ac-columnSet.ac-selectable:active {
+          background-color: rgba(0, 0, 0, 0.15) !important;
+        }
 
       .ac-pushButton {
+        text-align: center;
+        vertical-align: middle;
+        cursor: default;
+        font-family: "Calibri", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        border: 1px solid #DDDDDD;
+        background-color: #FFFFFF;
+        color: #0063B1;
+      }
+
+        .ac-pushButton:focus {
+          border-color: #0063B1;
+        }
+
+        .ac-pushButton.style-positive {
+          background-color: #0078D7;
+          color: white;
+        }
+
+          .ac-pushButton.style-positive:hover, .ac-pushButton.style-positive:active {
+            background-color: #006ABC;
+          }
+
+        .ac-pushButton.style-destructive {
+          background-color: #E50000;
+          color: white;
+        }
+
+          .ac-pushButton.style-destructive:hover, .ac-pushButton.style-destructive:active {
+            background-color: #BF0000;
+          }
+
+      .ac-quickActionButton {
         overflow: hidden;
         text-overflow: ellipsis;
         text-align: center;
         vertical-align: middle;
         cursor: default;
-        font-family: "Segoe UI", sans-serif;
+        font-family: "Calibri", sans-serif;
         font-size: 14px;
         font-weight: 600;
-        padding: 4px 10px 5px 10px;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        height: 31px;
-        background-color: white;
-        color: #5D60B3;
-        border: 2px solid #5D60B3;
-      }
-
-      .ac-pushButton:hover {
-        background-color: #5D60B3;
-        color: white;
-      }
-
-      .ac-pushButton:active {
-        background-color: #4F5399;
-        color: white;
-      }
-
-      .ac-pushButton.expanded {
-        background-color: #4F5399;
-        color: white;
+        border: none;
+        background-color: #DDDDDD;
       }
 
       .ac-input {
-        font-family: "Segoe UI", sans-serif;
+        font-family: "Calibri", sans-serif;
         font-size: 14px;
         color: black;
-        height: 31px;
+      }
+
+        .ac-input.ac-input-required {
+        }
+
+        .ac-input.ac-textInput.ac-input-validation-failed,
+        .ac-input.ac-numberInput.ac-input-validation-failed,
+        .ac-input.ac-dateInput.ac-input-validation-failed,
+        .ac-input.ac-timeInput.ac-input-validation-failed,
+        .ac-input.ac-multichoiceInput.ac-choiceSetInput-compact.ac-input-validation-failed {
+          border: 1px solid red !important;
+        }
+
+        .ac-input.ac-toggleInput.ac-input-validation-failed,
+        .ac-input.ac-choiceSetInput-expanded.ac-input-validation-failed,
+        .ac-input.ac-choiceSetInput-multiSelect.ac-input-validation-failed {
+          outline: 1px solid red;
+        }
+
+      .ac-input-container {
+        display: flex;
+        align-items: flex-end;
       }
 
       .ac-input.ac-textInput {
         resize: none;
       }
 
-      .ac-input.ac-textInput.ac-multiline {
-        height: 72px;
-      }
+        .ac-input.ac-textInput.ac-multiline {
+          height: 72px;
+        }
 
-      .ac-input.ac-textInput,
-      .ac-input.ac-numberInput,
-      .ac-input.ac-dateInput,
-      .ac-input.ac-timeInput {
+      .ac-input.ac-textInput, .ac-input.ac-numberInput, .ac-input.ac-dateInput, .ac-input.ac-timeInput {
         height: 31px;
       }
 
-      .ac-input.ac-textInput,
-      .ac-input.ac-numberInput,
-      .ac-input.ac-dateInput,
-      .ac-input.ac-timeInput,
-      .ac-input.ac-multichoiceInput {
-        border: 1px solid #DDDDDD;
+      .ac-input.ac-textInput, .ac-input.ac-numberInput, .ac-input.ac-dateInput, .ac-input.ac-timeInput, .ac-input.ac-multichoiceInput {
+        border: 1px solid #dddddd;
         padding: 4px 8px 4px 8px;
       }
 
+      /* ac-inlineActionButton should set height to the same as ac-input.ac-textInput */
+
+      .ac-inlineActionButton {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        font-family: "Calibri", sans-serif;
+        font-size: 13.3px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        border: none;
+        background-color: transparent;
+        height: 31px;
+      }
+
+        .ac-inlineActionButton.textOnly {
+          padding: 0 8px;
+        }
+
+        .ac-inlineActionButton.iconOnly {
+          padding: 0;
+        }
+
+        .ac-inlineActionButton:hover {
+          background-color: #EEEEEE;
+        }
+
+        .ac-inlineActionButton:active {
+          background-color: #CCCCCC;
+        }
+
+
+      /* customized styles */
+      .ac-pushButton, .ac-selectable {
+        cursor: pointer;
+      }
     </style>
+
+    <at-core-activity id="carddefinition" on-response="_carddefinitionResponse" no-credentials></at-core-activity>
+    <at-core-activity-queue id="post" on-response="_dataResponse" on-error="_handleRequestError" indicator="[[busy]]"></at-core-activity-queue>
+    <at-core-spinner id="spinner" display="none" type="line"></at-core-spinner>
 
     <div id="rcContainer"></div>
 
   </template>
 </dom-module>
 <script>
-(function(){
-  var templateCache = {};
+  (function () {
+    var templateCache = {};
 
-  Polymer({
-    is: "at-silver-adaptive",
-    properties: {
-      /**
-       * json representation of adaptive card. Must be a string with or without liquid markup
-       * 
-       * @property view
-       * @type String
-       * @default '{}'
-       */
-      view: {
-        type: String,
-        value:'{}',
-        xtype: 'json',
-        xgridcols: "12",
-        maxLines: 0,
-        mode: 'application/json'
-      },
+    Polymer({
+      is: "at-silver-adaptive",
+      properties: {
 
-      /**
-       * object or json representation of style values that will be used to render adaptive card
-       * 
-       * @property hostConfig
-       * @type String | Object
-       * @default {}
-       */
-      hostConfig: {
-        type: Object,
-        value: function() {
-          return {};
+        url: {
+          type: String,
+          value: ""
         },
-        xtype: 'json',
-        xgridcols: "12",
-        maxLines: 0,
-        mode: 'application/json'
-      },
-
-      /**
-       * the model object that will be used to render the liquid template
-       * 
-       * @property model
-       * @type Object
-       * @default {}
-       */
-      model: {
-        type: Object,
-        value: function() {
-          return {};
+        
+        busy: {
+          type: Boolean,
+          value: false
         },
-        xtype: 'json',
-        xgridcols: "12",
-        maxLines: 0,
-        mode: 'application/json'
-      },
 
-      /**
-       * path to the sub-object / value inside .model to use as data to render the liquid template
-       * 
-       * @property modelRoot
-       * @type String
-       * @default ''
-       */
-      modelRoot: {
-        type: String,
-        value: ''
-      },
-
-      /**
-       * html to be used as placeholder while element is rendering the adaptive card content
-       * 
-       * @property placeholder
-       * @type String
-       * @default "<div class='m'> <div class='placeholder-text'></div><div class='placeholder-text mtsm'></div></div>"
-       */
-      placeholder: {
-        type: String,
-        value: '<div class="m"> <div class="placeholder-text"></div><div class="placeholder-text mtsm"></div></div>',
-        xtype: 'code',
-        xgridcols: "12",
-        mode: "html"
-      }
-    },
-
-    $meta: [{
-      title: "Adaptive Card",
-      type: "element",
-      xtype: "at-silver-adaptive",
-      events: [],
-      icon: "now:wrench"
-    }],
-
-    observers: [
-      '_updateRenderedView(view, hostConfig, model, modelRoot, placeholder)'
-    ],
-
-    ready: function() { },
-
-    // TODO add more properties to default host config as necessary
-    // reference url: https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig
-    _DEFAULT_HOST_CONFIG: {
-      spacing: {
-        small: 3,
-        default: 8,
-        medium: 20,
-        large: 30,
-        extraLarge: 40,
-        padding: 10
-      },
-      separator: {
-        lineThickness: 1,
-        lineColor: "#EEEEEE"
-      },
-      supportsInteractivity: true,
-      fontFamily: "Segoe UI", 
-      fontSizes: {
-        small: 12,
-        default: 14,
-        medium: 17,
-        large: 21,
-        extraLarge: 26
-      },
-      fontWeights: {
-        lighter: 200,
-        default: 400,
-        bolder: 600
-      },
-      containerStyles: {
-        default: {
-          backgroundColor: "#00000000",
-          fontColors: {
-            default: {
-              normal: "#333333",
-              subtle: "#EE333333"
-            },
-            accent: {
-              normal: "#2E89FC",
-              subtle: "#882E89FC"
-            },
-            attention: {
-              normal: "#FF0000",
-              subtle: "#DDFFD800"
-            },
-            good: {
-              normal: "#00FF00",
-              subtle: "#DD00FF00"
-            },
-            warning: {
-              normal: "#FFD800",
-              subtle: "#DDFF0000"
-            }
-          }
+        /**
+         * json representation of adaptive card. Must be a string with or without liquid markup
+         *
+         * @property view
+         * @type String
+         * @default '{}'
+         */
+        view: {
+          type: String,
+          value: '{}',
+          xtype: 'json',
+          xgridcols: "12",
+          maxLines: 0,
+          mode: 'application/json'
         },
-        emphasis: {
-          backgroundColor: "08000000",
-          fontColors: {
-            default: {
-              normal: "#333333",
-              subtle: "#EE333333"
-            },
-            accent: {
-              normal: "#2E89FC",
-              subtle: "#882E89FC"
-            },
-            attention: {
-              normal: "#FFD800",
-              subtle: "#DDFFD800"
-            },
-            good: {
-              normal: "#00FF00",
-              subtle: "#DD00FF00"
-            },
-            warning: {
-              normal: "#FF0000",
-              subtle: "#DDFF0000"
-            }
-          }
+
+        /**
+         * object or json representation of style values that will be used to render adaptive card
+         *
+         * @property hostConfig
+         * @type String | Object
+         * @default {}
+         */
+        hostConfig: {
+          type: Object,
+          value: function () {
+            return {};
+          },
+          xtype: 'json',
+          xgridcols: "12",
+          maxLines: 0,
+          mode: 'application/json'
+        },
+
+        /**
+         * the model object that will be used to render the liquid template
+         *
+         * @property model
+         * @type Object
+         * @default {}
+         */
+        model: {
+          type: Object,
+          value: function () {
+            return {};
+          },
+          xtype: 'json',
+          xgridcols: "12",
+          maxLines: 0,
+          mode: 'application/json'
+        },
+
+        /**
+         * path to the sub-object / value inside .model to use as data to render the liquid template
+         *
+         * @property modelRoot
+         * @type String
+         * @default ''
+         */
+        modelRoot: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * html to be used as placeholder while element is rendering the adaptive card content
+         *
+         * @property placeholder
+         * @type String
+         * @default "<div class='m'> <div class='placeholder-text'></div><div class='placeholder-text mtsm'></div></div>"
+         */
+        placeholder: {
+          type: String,
+          value: '<div class="m"> <div class="placeholder-text"></div><div class="placeholder-text mtsm"></div></div>',
+          xtype: 'code',
+          xgridcols: "12",
+          mode: "html"
         }
       },
-      imageSizes: {
-        small: 40,
-        medium: 80,
-        large: 160
-      },
-      actions: {
-        maxActions: 3,
-        spacing: 2,
-        buttonSpacing: 10,
-        showCard: {
-          actionMode: "inline",
-          inlineTopMargin: 16
+
+      $meta: [{
+        title: "Adaptive Card",
+        type: "element",
+        xtype: "at-silver-adaptive",
+        events: [],
+        icon: "now:wrench"
+      }],
+
+      observers: [
+        '_updateRenderedView(view, hostConfig, model, modelRoot, placeholder)'
+      ],
+
+      ready: function () { },
+
+      // TODO add more properties to default host config as necessary
+      // reference url: https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig
+      _DEFAULT_HOST_CONFIG: {
+        spacing: {
+          small: 3,
+          default: 8,
+          medium: 20,
+          large: 30,
+          extraLarge: 40,
+          padding: 10
         },
-        actionsOrientation: 0,
-        actionAlignment: 0
-      },
-      adaptiveCard: {
-        allowCustomStyle: false
-      },
-      image: {
-        size: "medium",
-      },
-      imageSet: {
-        imageSize: "medium",
-        maxImageHeight: 100
-      },
-      factSet: {
-        title: {
-          color: "default",
-          size: "default",
-          isSubtle: false,
-          weight: "bolder",
-          wrap: true,
-          maxWidth: 150
+        separator: {
+          lineThickness: 1,
+          lineColor: "#EEEEEE"
         },
-        value: {
-          color: "default",
-          size: "default",
-          isSubtle: false,
-          weight: "default",
+        supportsInteractivity: true,
+        fontFamily: "Segoe UI",
+        fontSizes: {
+          small: 12,
+          default: 14,
+          medium: 17,
+          large: 21,
+          extraLarge: 26
+        },
+        fontWeights: {
+          lighter: 200,
+          default: 400,
+          bolder: 600
+        },
+        containerStyles: {
+          default: {
+            backgroundColor: "#00000000",
+            fontColors: {
+              default: {
+                normal: "#333333",
+                subtle: "#EE333333"
+              },
+              accent: {
+                normal: "#2E89FC",
+                subtle: "#882E89FC"
+              },
+              attention: {
+                normal: "#FF0000",
+                subtle: "#DDFFD800"
+              },
+              good: {
+                normal: "#00FF00",
+                subtle: "#DD00FF00"
+              },
+              warning: {
+                normal: "#FFD800",
+                subtle: "#DDFF0000"
+              }
+            }
+          },
+          emphasis: {
+            backgroundColor: "08000000",
+            fontColors: {
+              default: {
+                normal: "#333333",
+                subtle: "#EE333333"
+              },
+              accent: {
+                normal: "#2E89FC",
+                subtle: "#882E89FC"
+              },
+              attention: {
+                normal: "#FFD800",
+                subtle: "#DDFFD800"
+              },
+              good: {
+                normal: "#00FF00",
+                subtle: "#DD00FF00"
+              },
+              warning: {
+                normal: "#FF0000",
+                subtle: "#DDFF0000"
+              }
+            }
+          }
+        },
+        imageSizes: {
+          small: 40,
+          medium: 80,
+          large: 160
+        },
+        actions: {
+          maxActions: 3,
+          spacing: 2,
+          buttonSpacing: 10,
+          showCard: {
+            actionMode: "inline",
+            inlineTopMargin: 16
+          },
+          actionsOrientation: 0,
+          actionAlignment: 0
+        },
+        adaptiveCard: {
+          allowCustomStyle: false
+        },
+        image: {
+          size: "medium",
+        },
+        imageSet: {
+          imageSize: "medium",
+          maxImageHeight: 100
+        },
+        factSet: {
+          title: {
+            color: "default",
+            size: "default",
+            isSubtle: false,
+            weight: "bolder",
+            wrap: true,
+            maxWidth: 150
+          },
+          value: {
+            color: "default",
+            size: "default",
+            isSubtle: false,
+            weight: "default",
+            wrap: true
+          },
+          spacing: 10
+        }
+      },
+
+      actionListener: function (event) {
+
+        var model = event.detail.model.state.model;
+        this.model = model;
+
+      },
+
+      _carddefinitionResponse: function (e) {
+        if (e.detail.ErrorCode == 0) {
+          this.model._card.adaptiveDefinition = e.detail.Data.$meta.adaptiveCard;
+          this.view = this.model._card.adaptiveDefinition;
+
+          Tangere.asyncQueue.add("at-silverc-adaptive._loadcarddefinition", function () {
+            this.fire('content-changed', this, { bubbles: true });      
+          }, this);
+        }
+      },
+
+      _dataResponse: function (e) {        
+        this._appendStatusView(!e.detail.response.Data.failed, e.detail.response.Data.message);
+        this.busy = false;
+        this.$.spinner.display = "none";
+      },
+
+      _handleRequestError: function (e) {
+        var msg = "Request failed";
+        if (e.detail.error && e.detail.error.message) msg = e.detail.error.message;
+        this._appendStatusView(false, msg);
+        this.busy = false;
+        this.$.spinner.display = "none";
+      },
+
+      _appendStatusView: function (success, message) {
+        if(message) message = message.split("<br>").join(" ");
+        var ac = JSON.parse(this.view);
+        var box = {
+          type: "TextBlock",
+          text: message|| (success ? "success" : "failed"),
+          color: !success ? "Attention" : "Good",
           wrap: true
-        },
-        spacing: 10
-      }
-    },
-
-    actionListener: function(event) {
-
-      var model = event.detail.model.state.model;
-      this.model = model;
-
-    },
-
-    _updateRenderedView: function(_view, hostConfig, _model, modelRoot, placeholder) {
-
-      var view = _view, model = _model;
-      if (this._isString(placeholder)) {
-        Polymer.dom(this.$.rcContainer).innerHTML = placeholder;
-      }
-
-      if (!view || !this.model) return;      
-
-      try {
-        
-        if (this._isString(_view)) view = JSON.parse(_view);        
-        if (this._isString(_model)) model = JSON.parse(_model);
-        
-        var data = model;
-        if (modelRoot) {
-          data = this._getObjPath(data, modelRoot);
         }
-          
-        // Create a Template instamce from the template payload
-        var template = new ACData.Template(view);
+        ac.body.push(box);
+        this.view = JSON.stringify(ac);
+        this.fire('content-changed', this, { bubbles: true });      
+      },
 
-        // Create a data binding context, and set its $root property to the
-        // data object to bind the template to
-        var context = new ACData.EvaluationContext();
-        context.$root = data;
+      _updateRenderedView: function (_view, hostConfig, _model, modelRoot, placeholder) {         
+        var view = _view, model = _model;
+        if (this._isString(placeholder)) {
+          Polymer.dom(this.$.rcContainer).innerHTML = placeholder;
+        }
 
-        // "Expand" the template - this generates the final Adaptive Card,
-        // ready to render
-        var card = template.expand(context);
+        if (model._card && model._card.type) {         
+          if (!model._card.adaptiveDefinition) {
+            // card requires custom template, but not provided in payload, so we need to load it here
+            this.view = "";
+            view = "";
 
-        // Render the card
-        var adaptiveCard = new AdaptiveCards.AdaptiveCard();
-        adaptiveCard.parse(card);
-       
-      } catch (e) {
-        console.log(e);
-        return;
-      }            
-      
-      var config = this._computeHostConfig(hostConfig);      
+            Tangere.asyncQueue.add("at-silverc-adaptive._loadcarddefinition", function () {
+              this.$.carddefinition.url = (window.atAPIHost || "https://app.adenin.com") + "/api/CardDefinition/" + model._card.type;
+              this.$.carddefinition.generateRequest();
+            }, this);
+          } else {
+            view = model._card.adaptiveDefinition;
+            _view = view;            
+          }
+        }
 
-      // onAnchorClicked is used because links can be present on the card
-      adaptiveCard.onAnchorClicked = this._handleOnAnchorClicked.bind(this);
+        if (!view || !this.model) return;
 
-      // onExecuteAction is used because one can click view button on the card
-      adaptiveCard.onExecuteAction = this._handleCardExecuteAction.bind(this);
-
-      // onInlineCardExpanded is used becuase some buttons show/hide parts of the card
-      adaptiveCard.onInlineCardExpanded = this._handleOnInlineCardExpanded.bind(this);
-     
-      Object.assign(config,  adaptiveCard.hostConfig);      
-      
-      try {
-        var renderedCard = adaptiveCard.render();
-        
-        Polymer.dom(this.$.rcContainer).innerHTML = "";
-        Polymer.dom(this.$.rcContainer).appendChild(renderedCard);
-
-      } catch(e) {
-        console.log(e);
-      }
-    },
-
-    _handleOnAnchorClicked: function(event) {
-
-      this._applyStyleScopeToAdaptiveCard();
-    },
-
-    _handleCardExecuteAction: function(action) {
-
-      this._applyStyleScopeToAdaptiveCard();
-    },
-
-    _handleOnInlineCardExpanded: function(event) {
-
-      this._applyStyleScopeToAdaptiveCard();
-    },
-
-    _computeHostConfig: function(hostConfig) {
-      var config = this._DEFAULT_HOST_CONFIG;
-      
-      if (this._isObject(hostConfig)) {
-        // merge hostConfig with default config and use that as config
-        config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfig);
-
-      } else if (this._isString(hostConfig)) {
-        // parse json and merge with default config and use that as config
         try {
-          var hostConfigObj = JSON.parse(hostConfig);
-          config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfigObj);
-        } catch (e) { console.log(e); }
-      }
-      return config;
-    },
 
-    _applyStyleScopeToAdaptiveCard: function() {
-      // when actions are performed style scoping is lost; redo the style scoping
-      var child = Polymer.dom(this.$.rcContainer).children[0];
-      this.scopeSubtree(child, true);
-    },
+          if (this._isString(_view)) view = JSON.parse(_view);
+          if (this._isString(_model)) model = JSON.parse(_model);
 
-    _mergeConfigurations: function(src1, src2) {
-      var result = {};
-
-      var src1keys = Object.keys(src1);
-      var src2keys = Object.keys(src2);
-
-      if (!src2keys.length) return src1;
-
-      // iterate over src1 keys
-      src1keys.forEach(function(src1key) {
-        // check if src1key exists in src2
-        var exists = this._existsInArray(src1key, src2keys);
-        
-        if (exists) {
-          // if exists copy values from src2 to result
-          var src1Value = src1[src1key];
-          var src2Value = src2[src1key];
-
-          if (this._isObject(src1Value) && this._isObject(src2Value)) {
-            result[src1key] = this._mergeConfigurations(src1[src1key], src2[src1key]);
-
-          } else {            
-            result[src1key] = src2Value;
+          var data = model;
+          if (modelRoot) {
+            data = this._getObjPath(data, modelRoot);
           }
 
-        } else {
-          // else use values from src1
-          result[src1key] = src1[src1key];
+          // Create a Template instamce from the template payload
+          var template = new ACData.Template(view);
+
+          var context = { $root: data };
+
+          // "Expand" the template - this generates the final Adaptive Card,
+          // ready to render
+          var card = template.expand(context);
+
+          // Render the card
+          var adaptiveCard = new AdaptiveCards.AdaptiveCard();
+          adaptiveCard.parse(card);
+
+        } catch (e) {
+          console.log(e);
+          return;
         }
-      }, this);
 
-      return result;
-    },
+        var config = this._computeHostConfig(hostConfig);
 
-    _isString: function(obj) {
-      return Object.prototype.toString.apply(obj) === "[object String]";
-    },
+        // bind event handlers
+        adaptiveCard.onElementVisibilityChanged = this._handleOnElementVisibilityChanged.bind(this)        
+        adaptiveCard.onAnchorClicked = this._handleOnAnchorClicked.bind(this);
+        adaptiveCard.onExecuteAction = this._handleCardExecuteAction.bind(this);
+        adaptiveCard.onInlineCardExpanded = this._handleOnInlineCardExpanded.bind(this);
 
-    _isObject: function(obj) {
-      return Object.prototype.toString.apply(obj) === "[object Object]";
-    },
+        Object.assign(config, adaptiveCard.hostConfig);
 
-    _isArray: function(obj) {
-      return Object.prototype.toString.apply(obj) === "[object Array]";
-    },
+        try {
+          var renderedCard = adaptiveCard.render();
 
-    _existsInArray: function(key, array) {
-      for (var i = 0; i < array.length; i++) {
-        var current = array[i];
-        if (current === key) return true;
+          Polymer.dom(this.$.rcContainer).innerHTML = "";
+          Polymer.dom(this.$.rcContainer).appendChild(renderedCard);
+
+        } catch (e) {
+          console.log(e);
+        }
+      },
+
+      _handleOnElementVisibilityChanged: function (element) {
+        this.fire('content-changed', this, { bubbles: true });        
+      },
+
+      _handleOnAnchorClicked: function (event) {
+        this.fire('content-changed', this, { bubbles: true });
+        debugger;        
+      },
+
+      _handleCardExecuteAction: function (action) {        
+        if (action instanceof AdaptiveCards.SubmitAction) this._handleCardOnSubmit(action);
+        if (action instanceof AdaptiveCards.OpenUrlAction) this._handleCardOnOpenUrl(action);        
+      },
+
+      _handleCardOnOpenUrl(action) {
+        var w = window.open(action.url);        
+      },
+
+      _handleCardOnSubmit: function (action) {
+
+        this._removeActionSubmit(action.data);
+        this.busy = true;
+
+        var id = action.id || "submit";
+        var data = action.data || {};
+        if (!data.action) data.action = id;
+        if (!data.id && !!this.model.id) data.id = this.model.id; 
+
+        // *todo* allow to override url by optional model._card.actionUrl
+
+        var requestOptions = {
+          method: "POST",
+          url: this.url.replace("/gateway/card/", "/cardAction/"),
+          contentType: "application/json",
+          body: data,
+        }
+
+        this.$.post.addRequest(requestOptions);
+        this.$.spinner.display = "block";        
+      },
+
+      _removeActionSubmit: function (model) {
+
+        this.view = JSON.stringify(clone(JSON.parse(this.view)));
+
+        // special clone: deep remove of all Action.Submit and assign values to inputs
+        function clone(obj) {
+          var copy;
+
+          // Handle the 3 simple types, and null or undefined
+          if (null == obj || "object" != typeof obj) return obj;
+
+          // Handle Date
+          if (obj instanceof Date) {
+            copy = new Date();
+            copy.setTime(obj.getTime());
+            return copy;
+          }
+
+          // Handle Array
+          if (obj instanceof Array) {
+            copy = [];
+            for (var i = 0, len = obj.length; i < len; i++) {
+              var src = obj[i];
+              if (src.type && src.type == "Action.Submit") continue; // remove Submit buttons
+              if (src.id && src.type && src.type.indexOf("Input.") == 0) src.value = model[src.id]; // assign value
+              copy[i] = clone(src);
+            }
+            return copy;
+          }
+
+          // Handle Object
+          if (obj instanceof Object) {
+            copy = {};
+            for (var attr in obj) {
+              if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+            }
+            return copy;
+          }
+
+          throw new Error("Unable to copy obj! Its type isn't supported.");
+        }
+
+
+      },
+
+      _handleOnInlineCardExpanded: function (event) {
+        this.fire('content-changed', this, { bubbles: true });   
+        debugger;
+      },
+
+      _computeHostConfig: function (hostConfig) {
+        var config = this._DEFAULT_HOST_CONFIG;
+
+        if (this._isObject(hostConfig)) {
+          // merge hostConfig with default config and use that as config
+          config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfig);
+
+        } else if (this._isString(hostConfig)) {
+          // parse json and merge with default config and use that as config
+          try {
+            var hostConfigObj = JSON.parse(hostConfig);
+            config = this._mergeConfigurations(this._DEFAULT_HOST_CONFIG, hostConfigObj);
+          } catch (e) { console.log(e); }
+        }
+        return config;
+      },
+
+
+      _mergeConfigurations: function (src1, src2) {
+        var result = {};
+
+        var src1keys = Object.keys(src1);
+        var src2keys = Object.keys(src2);
+
+        if (!src2keys.length) return src1;
+
+        // iterate over src1 keys
+        src1keys.forEach(function (src1key) {
+          // check if src1key exists in src2
+          var exists = this._existsInArray(src1key, src2keys);
+
+          if (exists) {
+            // if exists copy values from src2 to result
+            var src1Value = src1[src1key];
+            var src2Value = src2[src1key];
+
+            if (this._isObject(src1Value) && this._isObject(src2Value)) {
+              result[src1key] = this._mergeConfigurations(src1[src1key], src2[src1key]);
+
+            } else {
+              result[src1key] = src2Value;
+            }
+
+          } else {
+            // else use values from src1
+            result[src1key] = src1[src1key];
+          }
+        }, this);
+
+        return result;
+      },
+
+      _isString: function (obj) {
+        return Object.prototype.toString.apply(obj) === "[object String]";
+      },
+
+      _isObject: function (obj) {
+        return Object.prototype.toString.apply(obj) === "[object Object]";
+      },
+
+      _isArray: function (obj) {
+        return Object.prototype.toString.apply(obj) === "[object Array]";
+      },
+
+      _existsInArray: function (key, array) {
+        for (var i = 0; i < array.length; i++) {
+          var current = array[i];
+          if (current === key) return true;
+        }
+
+        return false;
+      },
+
+      _getObjPath: function (obj, path) {
+        if (!path) return obj;
+        var paths = path.split('.'),
+          current = obj;
+
+        for (var i = 0; i < paths.length; ++i) {
+          if (current[paths[i]] == undefined) {
+            return undefined;
+          } else {
+            current = current[paths[i]];
+          }
+        }
+        return current;
       }
 
-      return false;
-    },
-
-    _getObjPath: function (obj, path) {
-      if (!path) return obj;
-      var paths = path.split('.'),
-        current = obj;
-
-      for (var i = 0; i < paths.length; ++i) {
-        if (current[paths[i]] == undefined) {
-          return undefined;
-        } else {
-          current = current[paths[i]];
-        }
-      }
-      return current;
-    }
-
-  });
-})();
+    });
+  })();
 </script>

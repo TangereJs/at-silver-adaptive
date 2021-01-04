@@ -1,0 +1,17 @@
+{
+  "name": "at-silver-adaptive",
+  "private": true,
+  "dependencies": {
+    "polymer": "Polymer/polymer#master"
+  },
+  "homepage": "https://github.com/TangereJs/at-silver-adaptive",
+  "_release": "a672f0202c",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "a672f0202c3034c352212f8e4382105ba555f8ed"
+  },
+  "_source": "https://github.com/TangereJs/at-silver-adaptive.git",
+  "_target": "master",
+  "_originalSource": "TangereJs/at-silver-adaptive"
+}
